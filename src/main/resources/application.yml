@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: seoul-rose
+
+  security:
+    enabled: false
+
+  datasource:
+    driverClassName: org.postgresql.Driver
+    # jdbcUrl: jdbc:postgresql://203.250.148.52:20516/seoul_genai
+    jdbcUrl: jdbc:postgresql://203.250.148.52:20516/seoul_genai
+    username: default
+    password: default
+
+server:
+  port: 8080
+
+genai:
+  base: http://203.250.148.52:27580/genai/
+
+video:
+  base: http://203.250.148.52:27575/
+
+http.pool:
+  max.total: 200
+  defaultMaxPerRoute: 100
+  connection.timeout: 5000
+  connection.request.timeout: 5000
+  read.timeout: 10000
+  validate.after.inactivity: 2000
