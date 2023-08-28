@@ -18,56 +18,58 @@ CREATE TABLE session (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id)
 );
-CREATE SEQUENCE lecture_id_seq INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
-CREATE TABLE LECTURE (
-    id INT NOT NULL DEFAULT nextval('lecture_id_seq' :: regclass),
-    category TEXT NOT NULL,
-    level TEXT NOT NULL,
-    title TEXT NOT NULL,
-    detail TEXT,
-    total_time INT, --- hour
-    thumenail_link TEXT,
-    video_link TEXT,
-    is_active boolean,
+
+CREATE SEQUENCE image_id_seq INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
+CREATE TABLE image (
+    id INT NOT NULL DEFAULT nextval('image_id_seq' :: regclass),
+    origin_img_path TEXT ,
+    expand_img_path TEXT ,
+    session_id INT ,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    modified_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,    
     PRIMARY KEY (id)
 );
-CREATE SEQUENCE lecture_detail_id_seq INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
-CREATE TABLE LECTURE_DETAIL (
-    id INT NOT NULL DEFAULT nextval('lecture_detail_id_seq' :: regclass),
-    lecture_seq INT NOT NULL,
-    title TEXT NOT NULL,
-    show_title TEXT,
-    parent_lecture_id TEXT,
-    video_link TEXT,
-    stt_text TEXT,
+
+CREATE SEQUENCE chat_id_seq INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
+CREATE TABLE chat (
+    id INT NOT NULL DEFAULT nextval('chat_id_seq' :: regclass),
+    session_id INT NOT NULL,
+    msg_num INT,
+    msg_type TEXT,
+    text TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    modified_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,    
     PRIMARY KEY (id)
 );
-CREATE TABLE ENROLL_LECTURE_USER (
-    user_id INT NOT NULL,
-    lecture_id INT NOT NULL,
-    running_time INT,
-    enrolled_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    last_study_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
+CREATE SEQUENCE story_id_seq INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
+CREATE TABLE story (
+    id INT NOT NULL DEFAULT nextval('story_id_seq' :: regclass),
+    session_id INT NOT NULL,
+    cover_img_id INT NOT NULL,
+    title TEXT,
+    creater TEXT,
+    lang TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id)
 );
-CREATE TABLE CHAT_HIST (
-    session INT NOT NULL,
-    user_id INT NOT NULL,
-    msg_type INT NOT NULL,
-    msg_num INT NOT NULL,
-    msg TEXT NOT NULL,
-    status TEXT,
-    img_url TEXT,
-    lecture_url TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
+CREATE SEQUENCE page_id_seq INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
+CREATE TABLE page (
+    id INT NOT NULL DEFAULT nextval('page_id_seq' :: regclass),
+    page_no INT ,
+    page_img_path TEXT,
+    page_content TEXT,
+    story_id INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id)
 );
-CREATE SEQUENCE session_id_seq INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
+
+
+CREATE SEQUENCE keyword_id_seq INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
 CREATE TABLE SESSION (
-    session INT NOT NULL DEFAULT nextval('session_id_seq' :: regclass),
-    user_id INT NOT NULL,
+    id INT NOT NULL DEFAULT nextval('keyword_id_seq' :: regclass),
+    type TEXT,
+    keyword TEXT,
+    story_id INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (session)
+    PRIMARY KEY (id)
 );
