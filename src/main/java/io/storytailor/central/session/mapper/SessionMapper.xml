@@ -1,0 +1,7 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.storytailor.central.session.mapper.SessionMapper">
+    <insert id="createSession" parameterType="io.storytailor.central.session.vo.SessionVO"
+        useGeneratedKeys="true"
+        keyProperty="sessionId" keyColumn="id"> INSERT INTO member ( id, created_at ) VALUES (
+        nextval('session_id_seq'), now() ); </insert>
+</mapper>

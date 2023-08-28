@@ -2,7 +2,7 @@
 
 -- DROP DATABASE IF EXISTS seoul_genai;
 
-CREATE DATABASE seoul_genai
+CREATE DATABASE storytailor
     WITH
     OWNER = "default"
     ENCODING = 'UTF8'
@@ -12,18 +12,10 @@ CREATE DATABASE seoul_genai
     CONNECTION LIMIT = -1
     IS_TEMPLATE = False;
 
-CREATE SEQUENCE member_id_seq INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
-CREATE TABLE member (
-    id INT NOT NULL DEFAULT nextval('member_id_seq' :: regclass),
-    name VARCHAR(255) NOT NULL,
-    email VARCHAR(255),
-    password VARCHAR(255),
-    phone VARCHAR(12),
-    enroll_lecture INT,
-    finsh_lecture INT,
-    level TEXT,
+CREATE SEQUENCE session_id_seq INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
+CREATE TABLE session (
+    id INT NOT NULL DEFAULT nextval('session_id_seq' :: regclass),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    modified_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id)
 );
 CREATE SEQUENCE lecture_id_seq INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;

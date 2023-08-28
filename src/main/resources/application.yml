@@ -1,6 +1,6 @@
 spring:
   application:
-    name: seoul-rose
+    name: storytailor
 
   security:
     enabled: false
@@ -13,13 +13,14 @@ spring:
     password: default
 
 server:
-  port: 8080
+  port: 8000
 
 genai:
   base: http://203.250.148.52:27580/genai/
 
-video:
-  base: http://203.250.148.52:27575/
+image:
+  uploadPath: /home/ubuntu/storytailor
+  baseUrl: http://{hostip}:8080/ # webserver port
 
 http.pool:
   max.total: 200
