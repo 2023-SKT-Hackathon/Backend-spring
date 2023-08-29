@@ -31,30 +31,30 @@ public class ImageSVC {
     @Autowired
     private ImageMapper imageMapper;
     
-    public Boolean uploadImage(MultipartFile originFile,
+    public ImageInfoVO uploadImage(MultipartFile originFile,
             MultipartFile expandFile, Integer sessionId) {
         ImageInfoVO imageInfoVO = new ImageInfoVO();
         Boolean resDict = createDict(sessionId);
         if (!resDict) {
-            return false;
+            return null;
         } else {
             imageInfoVO.setSessionId(sessionId);
         }
         String resOriginPath = saveDiskImage(sessionId, ImageCode.ORIGIN, originFile);
         if (resOriginPath == null) {
-            return false;
+            return null;
         } else {
             imageInfoVO.setOriginFilePath(baseUrl + resOriginPath);
         }
         String resExpandPath = saveDiskImage(sessionId, ImageCode.EXPAND, expandFile);
         if (resExpandPath == null) {
-            return false;
+            return null;
         } else {
             imageInfoVO.setExpandFilePath(baseUrl + resExpandPath);
         }
 
         imageMapper.insertImage(imageInfoVO);
-        return true;
+        return imageInfoVO;
     }
 
     public String saveDiskImage(Integer sessionId, ImageCode imgType, MultipartFile file){
@@ -66,6 +66,10 @@ public class ImageSVC {
             log.error("Fail to save image : {}", StringUtils.cleanPath(file.getOriginalFilename()), e);
             return null;
         }
+    }
+
+    public ImageInfoVO getImageInfoBySessionId(Integer sessionId) {
+        return imageMapper.selectImageInfo(sessionId);
     }
 
     private Boolean createDict(Integer sessionId) {

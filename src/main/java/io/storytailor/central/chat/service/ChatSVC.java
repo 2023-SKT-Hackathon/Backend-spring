@@ -11,6 +11,8 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
 
+import io.storytailor.central.chat.vo.ChatResponseVO;
+import io.storytailor.central.chat.vo.ChatVO;
 import io.storytailor.central.chat.vo.WhisperResponseVO;
 import io.storytailor.central.config.rest.RestService;
 import lombok.extern.slf4j.Slf4j;
@@ -46,5 +48,24 @@ public class ChatSVC {
             log.error("Fail to Convert Voice to Text",e);
             return null;
         }
+    }
+
+    public ChatVO getInitAiChat(Integer sessionId) {
+        log.info("User Request First Chat Request: " + sessionId.toString());
+        return null;
+    }
+
+    public ChatResponseVO sendAiChat(ChatVO chatRequestVO) {
+        log.info("User Chat Request: " + chatRequestVO.toString());
+        ResponseEntity<ChatResponseVO> res = restService.post(
+                genaiBaseUrl + "chat",
+                null,
+                null,
+                chatRequestVO,
+                null,
+                null,
+                ChatResponseVO.class);
+        log.info("AI Chat Response: " + res.getBody().toString());
+        return res.getBody();
     }
 }

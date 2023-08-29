@@ -24,6 +24,11 @@ public class ChatController {
         return ResponseEntity.ok().body(chatSVC.convertVoiceToText(voiceFile));
     }
 
+    @GetMapping("/api/chat/{sessionId}")
+    public ResponseEntity<?> getInitChat(@PathVariable Integer sessionId) {
+        return ResponseEntity.ok().body(null);
+    }
+    
     @PostMapping("/api/chat/{sessionId}")
     public ResponseEntity<?> chat(@PathVariable Integer sessionId, @RequestBody ChatVO chatVO) {
         return ResponseEntity.ok().body(null);

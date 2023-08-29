@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import io.storytailor.central.image.service.ImageSVC;
+import io.storytailor.central.image.vo.ImageInfoVO;
 
 @Controller
 public class ImageController {
@@ -18,6 +19,11 @@ public class ImageController {
     @PostMapping("/api/image/upload")
     public ResponseEntity<?> uploadImage(@RequestParam("originFile") MultipartFile originFile,
             @RequestParam("expandFile") MultipartFile expandFile, @RequestParam("sessionId") Integer sessionId) {
-        return ResponseEntity.ok().body(imageSVC.uploadImage(originFile, expandFile, sessionId));
+        ImageInfoVO res = imageSVC.uploadImage(originFile, expandFile, sessionId);
+        if (res == null) {
+            return ResponseEntity.badRequest().body("Fail to upload image");
+        } else {
+            return ResponseEntity.ok().body(res);
+        }
     }
 }

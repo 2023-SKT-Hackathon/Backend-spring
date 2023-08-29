@@ -8,4 +8,6 @@ import io.storytailor.central.image.vo.ImageInfoVO;
 @Mapper
 public interface ImageMapper {
     void insertImage(@Param("imageInfoVO") ImageInfoVO imageInfoVO);
+
+    ImageInfoVO selectImageInfo(@Param("sessionId") Integer sessionId);
 }
