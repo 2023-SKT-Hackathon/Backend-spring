@@ -1,7 +1,12 @@
 package io.storytailor.central.image.service;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -70,6 +75,32 @@ public class ImageSVC {
 
     public ImageInfoVO getImageInfoBySessionId(Integer sessionId) {
         return imageMapper.selectImageInfo(sessionId);
+    }
+
+    public String downloadImageFromUrl(Integer sessionId, ImageCode imgType, String url, String fileName) {
+        try {
+            URL urlEntity = new URL(url);
+            InputStream in = new BufferedInputStream(urlEntity.openStream());
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            byte[] buf = new byte[102400000];
+            int n = 0;
+            while (-1!=(n=in.read(buf)))
+                {
+                    out.write(buf, 0, n);
+                }
+            out.close();
+            in.close();
+            byte[] response = out.toByteArray();
+            /* save image file */
+            FileOutputStream fos = new FileOutputStream(uploadPath + File.separator + sessionId.toString() + File.separator + imgType.getCode() + File.separator + fileName + ".png");
+            fos.write(response);
+            fos.close();
+            return sessionId.toString() + File.separator + imgType.getCode() + File.separator + fileName + ".png";
+        } catch (Exception e) {
+            log.error("Fali to Download Image From : {}",url, e);
+            return null;
+        }
+
     }
 
     private Boolean createDict(Integer sessionId) {

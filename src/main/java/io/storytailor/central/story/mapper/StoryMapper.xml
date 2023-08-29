@@ -2,10 +2,7 @@
 <mapper namespace="io.storytailor.central.story.mapper.StoryMapper">
   <resultMap id="StoryVO" type="io.storytailor.central.story.vo.StoryVO">
     <result property="id" column="pipeline_id" />
-    <result property="originFilePath" column="origin_img_path" />
-    <result property="expandFilePath" column="expand_img_path" />
-    <result property="sessionId" column="session_id" />
-    <result property="createdAt" column="created_at" />
+
   </resultMap>
     <insert id="createSession" parameterType="io.storytailor.central.image.vo.ImageInfoVO"
         useGeneratedKeys="true"
@@ -16,4 +13,4 @@
         FROM image WHERE session_id = #{sessionId} ORDER BY created_at DESC LIMIT 1
     </select>
 
-</mapper>
+</mapper> 

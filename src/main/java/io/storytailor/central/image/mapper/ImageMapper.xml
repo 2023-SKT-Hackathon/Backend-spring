@@ -1,13 +1,13 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="io.storytailor.central.image.mapper.ImageMapper">
   <resultMap id="ImageInfoVO" type="io.storytailor.central.image.vo.ImageInfoVO">
-    <result property="id" column="pipeline_id" />
+    <result property="id" column="id" />
     <result property="originFilePath" column="origin_img_path" />
     <result property="expandFilePath" column="expand_img_path" />
     <result property="sessionId" column="session_id" />
     <result property="createdAt" column="created_at" />
   </resultMap>
-    <insert id="createSession" parameterType="io.storytailor.central.image.vo.ImageInfoVO"
+    <insert id="insertImage" parameterType="io.storytailor.central.image.vo.ImageInfoVO"
         useGeneratedKeys="true"
         keyProperty="id" keyColumn="id"> INSERT INTO image ( id, origin_img_path, expand_img_path, session_id, created_at ) VALUES (
         nextval('session_id_seq'), #{imageInfoVO.originFilePath}, #{imageInfoVO.expandFilePath},#{imageInfoVO.sessionId}, now() ); </insert>

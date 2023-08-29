@@ -20,6 +20,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 public class ChatSVC {
+    @Value("${flask.base-url}")
+    private String flaskBaseUrl;
+
     @Value("${openai-service.api-key}")
     private String openaiApiKey;
 
@@ -58,14 +61,14 @@ public class ChatSVC {
     public ChatResponseVO sendAiChat(ChatVO chatRequestVO) {
         log.info("User Chat Request: " + chatRequestVO.toString());
         ResponseEntity<ChatResponseVO> res = restService.post(
-                genaiBaseUrl + "chat",
+                flaskBaseUrl + "chat",
                 null,
                 null,
                 chatRequestVO,
                 null,
                 null,
                 ChatResponseVO.class);
-        log.info("AI Chat Response: " + res.getBody().toString());
+        log.info("AI Chat Response: " + res.getBody());
         return res.getBody();
     }
 }

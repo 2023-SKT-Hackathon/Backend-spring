@@ -1,8 +1,14 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="io.storytailor.central.keyword.mapper.KeywordMapper">
-    <insert id="createSession" parameterType="io.storytailor.central.session.vo.SessionVO"
+  <resultMap id="KeywordVO" type="io.storytailor.central.keyword.vo.KeywordVO">
+    <result property="id" column="id" />
+    <result property="sessionId" column="session_id" />
+    <result property="originFilePath" column="origin_img_path" />
+    <result property="expandFilePath" column="expand_img_path" />
+    <result property="createdAt" column="created_at" />
+  </resultMap>
+    <insert id="insertImage" parameterType="io.storytailor.central.image.vo.ImageInfoVO"
         useGeneratedKeys="true"
-        keyProperty="sessionId" keyColumn="id"> INSERT INTO member ( id, created_at ) VALUES (
-        nextval('session_id_seq'), now() ); </insert>
-    <select id="getKeyword"></select>
+        keyProperty="id" keyColumn="id"> INSERT INTO image ( id, origin_img_path, expand_img_path, session_id, created_at ) VALUES (
+        nextval('session_id_seq'), #{imageInfoVO.originFilePath}, #{imageInfoVO.expandFilePath},#{imageInfoVO.sessionId}, now() ); </insert>
 </mapper>
