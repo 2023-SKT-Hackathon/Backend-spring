@@ -1,7 +1,7 @@
 package io.storytailor.central.code;
 
 public enum ChatTypeCode {
-    USER("user"),
+    USER("human"),
     AI("ai");
 
     private String code;

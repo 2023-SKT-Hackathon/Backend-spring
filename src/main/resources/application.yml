@@ -15,7 +15,7 @@ server:
   port: 8008
 
 flask:
-  base-url: http://{flask-server-ip}:27580/genai/
+  base-url: http://{flask-server-ip}:{flask-server-port}/tailor/
 
 openai-service:
   api-key: ${OPEN_AI_API_KEY}
