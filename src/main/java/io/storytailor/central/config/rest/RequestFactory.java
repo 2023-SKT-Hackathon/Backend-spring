@@ -3,6 +3,8 @@ package io.storytailor.central.config.rest;
 import java.net.URI;
 
 import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
+import org.apache.hc.core5.http.ClassicHttpRequest;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
@@ -30,9 +32,9 @@ public class RequestFactory {
          * Create http uri request
          */
         @Override
-        protected HttpUriRequest createHttpUriRequest(HttpMethod httpMethod, URI uri) {
+        protected ClassicHttpRequest createHttpUriRequest(HttpMethod httpMethod, URI uri) {
             if (httpMethod == HttpMethod.GET) {
-                return new HttpGetRequestWithEntity(uri);
+                return new HttpGetRequestWithEntity(httpMethod.toString(), uri);
             }
             return super.createHttpUriRequest(httpMethod, uri);
         }
@@ -41,10 +43,10 @@ public class RequestFactory {
     /**
      * Http get request with entity
      */
-    private static final class HttpGetRequestWithEntity extends HttpEntityEnclosingRequestBase {
+    private static final class HttpGetRequestWithEntity extends HttpUriRequestBase {
 
-        public HttpGetRequestWithEntity(final URI uri) {
-            super.setURI(uri);
+        public HttpGetRequestWithEntity(final String method, final URI uri) {
+            super(method, uri);
         }
 
         /**

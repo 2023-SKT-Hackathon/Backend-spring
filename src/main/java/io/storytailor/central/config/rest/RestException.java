@@ -1,12 +1,22 @@
 package io.storytailor.central.config.rest;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestClientResponseException;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.storytailor.central.config.rest.vo.ClientExceptionPayloadVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class RestException extends BaseException {
 
     private static final long serialVersionUID = 325647261102179280L;
 
-    HttpStatus statusCode = null;
+    HttpStatusCode statusCode = null;
     ErrorPayload errorPayload = null;
 
     /**
@@ -18,7 +28,7 @@ public class RestException extends BaseException {
      * @param statusCode                  HttpStatus
      * @param RestClientResponseException exception
      */
-    public RestException(HttpStatus statusCode, RestClientResponseException exception) {
+    public RestException(HttpStatusCode statusCode, HttpClientErrorException exception) {
         super(null, exception.getMessage());
         this.statusCode = statusCode;
         String res = exception.getResponseBodyAsString();
@@ -77,7 +87,7 @@ public class RestException extends BaseException {
      *
      * @return Http status code
      */
-    public HttpStatus getHttpStatus() {
+    public HttpStatusCode getHttpStatus() {
         return this.statusCode;
     }
 
