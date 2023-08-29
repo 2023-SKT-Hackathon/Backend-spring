@@ -2,16 +2,6 @@
 
 -- DROP DATABASE IF EXISTS seoul_genai;
 
-CREATE DATABASE storytailor
-    WITH
-    OWNER = "default"
-    ENCODING = 'UTF8'
-    LC_COLLATE = 'en_US.utf8'
-    LC_CTYPE = 'en_US.utf8'
-    TABLESPACE = pg_default
-    CONNECTION LIMIT = -1
-    IS_TEMPLATE = False;
-
 CREATE SEQUENCE session_id_seq INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
 CREATE TABLE session (
     id INT NOT NULL DEFAULT nextval('session_id_seq' :: regclass),
@@ -65,7 +55,7 @@ CREATE TABLE page (
 
 
 CREATE SEQUENCE keyword_id_seq INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
-CREATE TABLE SESSION (
+CREATE TABLE keyword (
     id INT NOT NULL DEFAULT nextval('keyword_id_seq' :: regclass),
     type TEXT,
     keyword TEXT,

@@ -7,16 +7,22 @@ spring:
 
   datasource:
     driverClassName: org.postgresql.Driver
-    # jdbcUrl: jdbc:postgresql://203.250.148.52:20516/seoul_genai
-    jdbcUrl: jdbc:postgresql://203.250.148.52:20516/seoul_genai
-    username: default
-    password: default
+    url: jdbc:postgresql://storytailor-db.c1dmi7dj6oou.ap-northeast-2.rds.amazonaws.com:5432/storytailor
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
 
 server:
   port: 8000
 
 genai:
   base: http://203.250.148.52:27580/genai/
+
+openai-service:
+  api-key: ${OPEN_AI_API_KEY}
+  api-url: https://api.openai.com/v1
+  audio:
+    path: /audio/transcriptions
+    model: whisper-1
 
 image:
   uploadPath: /home/ubuntu/storytailor
