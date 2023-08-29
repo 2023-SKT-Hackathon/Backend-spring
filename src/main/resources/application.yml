@@ -12,7 +12,7 @@ spring:
     password: ${DB_PASSWORD}
 
 server:
-  port: 8000
+  port: 8008
 
 genai:
   base: http://203.250.148.52:27580/genai/
@@ -25,8 +25,8 @@ openai-service:
     model: whisper-1
 
 image:
-  uploadPath: /home/ubuntu/storytailor
-  baseUrl: http://{hostip}:8080/ # webserver port
+  upload-path: /img/upload
+  base-url: http://13.124.249.81:8080/ # webserver port
 
 http.pool:
   max.total: 200
