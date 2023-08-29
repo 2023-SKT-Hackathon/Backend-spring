@@ -26,6 +26,7 @@ public class ChatController {
 
     @GetMapping("/api/chat/{sessionId}")
     public ResponseEntity<?> getInitChat(@PathVariable Integer sessionId) {
+        chatSVC.getInitAiChat(sessionId);
         return ResponseEntity.ok().body(null);
     }
     

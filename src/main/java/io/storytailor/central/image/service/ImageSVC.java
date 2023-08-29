@@ -77,6 +77,10 @@ public class ImageSVC {
         return imageMapper.selectImageInfo(sessionId);
     }
 
+    public void createAiImage(String prompt){
+        
+    }
+
     public String downloadImageFromUrl(Integer sessionId, ImageCode imgType, String url, String fileName) {
         try {
             URL urlEntity = new URL(url);

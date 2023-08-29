@@ -2,15 +2,17 @@ package io.storytailor.central.chat.vo;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import io.storytailor.central.code.ChatProgressCode;
-import io.storytailor.central.code.ChatTypeCode;
 import lombok.Data;
 
 @Data
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ChatVO {
     private Integer chatId;
     private Integer msgNum;
-    private ChatTypeCode msgType;
+    private String msgType;
     private ChatProgressCode progress;
     private String text;
     private Integer sessionId;

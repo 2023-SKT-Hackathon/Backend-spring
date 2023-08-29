@@ -13,11 +13,11 @@ public class KeywordSVC {
 
     public KeywordVO getKeyword(Integer sessionId) {
         /* Request AI */
+        keywordMapper.selectKeyword(sessionId);
         return new KeywordVO();
     }
 
     public void createKeyword(KeywordVO keywordVO) {
-        /* Request AI */
         /* Save Database */
         keywordMapper.insertKeyword(keywordVO);
     }
