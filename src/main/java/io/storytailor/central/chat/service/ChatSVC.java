@@ -1,6 +1,7 @@
 package io.storytailor.central.chat.service;
 
 import io.storytailor.central.chat.mapper.ChatMapper;
+import io.storytailor.central.chat.vo.ChatHistoryVO;
 import io.storytailor.central.chat.vo.ChatRequestVO;
 import io.storytailor.central.chat.vo.ChatResponseVO;
 import io.storytailor.central.chat.vo.ChatVO;
@@ -105,8 +106,11 @@ public class ChatSVC {
     } else return null;
   }
 
-  public ChatVO sendAiChat(ChatVO chatVO) {
-    ChatRequestVO chatRequestVO = new ChatRequestVO();
+  public ChatVO sendAiChat(Integer sessionId, ChatVO chatVO) {
+    /* Insert Chat Hist */
+    chatMapper.insertChat(chatVO);
+    /* Send Ai question */
+    ChatRequestVO chatRequestVO = convertChatVOToChatRequestVO(chatVO);
     log.info("User Chat Request: " + chatRequestVO.toString());
     ResponseEntity<ChatResponseVO> res = restService.post(
       flaskBaseUrl + "chat",
@@ -119,10 +123,10 @@ public class ChatSVC {
     );
     log.info("AI Chat Response: " + res.getBody());
     ChatResponseVO responseVO = res.getBody();
-    ChatVO resChatVO = new ChatVO();
+    ChatVO resChatVO = convertChatResponseVOToChatVO(responseVO);
     if (responseVO != null) {
       /* save AI msg in Database */
-
+      chatMapper.insertChat(resChatVO);
       /* keyword save */
       if (responseVO.getStatus().equals("True")) {
         /* Extract Keyword */
@@ -143,19 +147,36 @@ public class ChatSVC {
         }
       }
     }
-    return res.getBody();
+    return resChatVO;
   }
 
-  private ChatResponseVO convertChatVOToChatResponseVO(ChatVO chatVO) {
-    ChatResponseVO chatResponseVO = new ChatResponseVO();
-    chatResponseVO.setMsgNum(chatVO.getMsgNum().toString());
-    chatResponseVO.setMsgType(chatVO.getMsgType());
-    chatResponseVO.setProgress(chatVO.getProgress());
-    chatResponseVO.setText(chatVO.getText());
-    return chatResponseVO;
+  private ChatRequestVO convertChatVOToChatRequestVO(ChatVO chatVO) {
+    ChatRequestVO chatRequestVO = new ChatRequestVO();
+    chatRequestVO.setMsgNum(chatVO.getMsgNum());
+    chatRequestVO.setMsgType(ChatTypeCode.USER.getCode());
+    chatRequestVO.setSessionId(chatVO.getSessionId());
+    chatRequestVO.setText(chatVO.getText());
+    ChatHistoryVO chatHistoryVO = new ChatHistoryVO();
+    /* Chat Hist Insert */
+    chatMapper.selectChatHist(chatVO.getSessionId());
+    for (ChatVO chat : chatVO.getChatHistory()) {
+      chatHistoryVO.getChat().add(convertChatVOToChatResponseVO(chat));
+    }
+    chatRequestVO.setHistory(chatHistoryVO);
+    return chatRequestVO;
   }
 
-  private convertChatResponseVOToChatVO(ChatResponseVO chatResponseVO) {
+  private ChatVO convertChatResponseVOToChatVO(ChatResponseVO chatResponseVO) {
     ChatVO chatVO = new ChatVO();
+    chatVO.setSessionId(Integer.parseInt(chatResponseVO.getSessionId()));
+    chatVO.setMsgNum(Integer.parseInt(chatResponseVO.getMsgNum()));
+    chatVO.setMsgType(ChatTypeCode.AI.getCode());
+    chatVO.setText(chatResponseVO.getText());
+    if (chatResponseVO.getStatus().equals("True")) {
+      chatVO.setProgress(ChatProgressCode.COMPLETE.getCode());
+    } else {
+      chatVO.setProgress(ChatProgressCode.DOING.getCode());
+    }
+    return chatVO;
   }
 }
