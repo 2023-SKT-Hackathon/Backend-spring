@@ -9,4 +9,6 @@ import io.storytailor.central.story.vo.StoryVO;
 @Mapper
 public interface StoryMapper {
     List<StoryVO> selectStoryList();
+
+    void deleteStory(Integer storyId);
 }

@@ -19,8 +19,8 @@
     #{keywordVO.keyword},#{keywordVO.sessionId}, now() ); </insert>
   <select id="selectKeyword" parameterType="Integer" resultMap="KeywordVO"> SELECT id, type AS type,
     keyword AS keyword, session_id AS sessionId, story_id AS storyId FROM keyword WHERE session_id =
-    #{sessionId} ORDER BY created_at DESC LIMIT 1 </select>
+    #{sessionId} ORDER BY created_at DESC </select>
   <select id="selectTempKeyword" parameterType="Integer" resultMap="KeywordVO"> SELECT id, type AS
     type, keyword AS keyword, session_id AS sessionId, story_id AS storyId FROM temp_keyword WHERE
-    session_id = #{sessionId} ORDER BY created_at DESC LIMIT 1 </select>
+    session_id = #{sessionId} ORDER BY created_at DESC</select>
 </mapper>

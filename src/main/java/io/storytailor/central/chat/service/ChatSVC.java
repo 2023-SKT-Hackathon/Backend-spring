@@ -13,6 +13,7 @@ import io.storytailor.central.keyword.service.KeywordSVC;
 import io.storytailor.central.keyword.vo.KeywordVO;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -158,10 +159,18 @@ public class ChatSVC {
     chatRequestVO.setText(chatVO.getText());
     ChatHistoryVO chatHistoryVO = new ChatHistoryVO();
     /* Chat Hist Insert */
-    chatMapper.selectChatHist(chatVO.getSessionId());
-    for (ChatVO chat : chatVO.getChatHistory()) {
-      chatHistoryVO.getChat().add(convertChatVOToChatResponseVO(chat));
+    List<ChatVO> chatHist = chatMapper.getChatList(chatVO.getSessionId());
+    List<String> userChatHist = new ArrayList<>();
+    List<String> aiChatHist = new ArrayList<>();
+    for (ChatVO chat : chatHist) {
+      if (chat.getMsgType().equals(ChatTypeCode.USER.getCode())) {
+        userChatHist.add(chat.getText());
+      } else {
+        aiChatHist.add(chat.getText());
+      }
     }
+    chatHistoryVO.setUserChat(userChatHist);
+    chatHistoryVO.setAiChat(aiChatHist);
     chatRequestVO.setHistory(chatHistoryVO);
     return chatRequestVO;
   }

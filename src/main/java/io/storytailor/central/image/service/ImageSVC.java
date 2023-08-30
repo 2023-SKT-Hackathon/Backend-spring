@@ -89,12 +89,6 @@ public class ImageSVC {
     } else {
       imageInfoVO.setExpandFilePath(baseUrl + resExpandPath);
     }
-    createAiImage(
-      new File(uploadPath + File.separator + resOriginPath),
-      new File(uploadPath + File.separator + resExpandPath),
-      "This is a photo of a person.",
-      "ai"
-    );
     imageMapper.insertImage(imageInfoVO);
     return imageInfoVO;
   }

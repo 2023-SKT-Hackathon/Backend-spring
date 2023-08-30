@@ -12,5 +12,7 @@
         SELECT id, origin_img_path AS originFilePath, expand_img_path AS expandFilePath, session_id AS sessionId, created_at AS createdAt 
         FROM image WHERE session_id = #{sessionId} ORDER BY created_at DESC LIMIT 1
     </select>
-
+    <delete id="deleteStory">
+        DELETE FROM story WHERE story_id = #{story_id}
+    </delete>
 </mapper> 

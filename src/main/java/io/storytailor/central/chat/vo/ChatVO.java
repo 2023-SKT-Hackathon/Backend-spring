@@ -8,7 +8,7 @@ import lombok.Data;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ChatVO {
 
-  private Integer chatId;
+  private Integer id;
   private Integer msgNum;
   private String msgType;
   private String progress;
