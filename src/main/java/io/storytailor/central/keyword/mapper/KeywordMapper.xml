@@ -3,12 +3,24 @@
   <resultMap id="KeywordVO" type="io.storytailor.central.keyword.vo.KeywordVO">
     <result property="id" column="id" />
     <result property="sessionId" column="session_id" />
-    <result property="originFilePath" column="origin_img_path" />
-    <result property="expandFilePath" column="expand_img_path" />
-    <result property="createdAt" column="created_at" />
+    <result property="type" column="type" />
+    <result property="keyword" column="keyword" />
+    <result property="storyId" column="story_id" />
   </resultMap>
-    <insert id="insertImage" parameterType="io.storytailor.central.image.vo.ImageInfoVO"
-        useGeneratedKeys="true"
-        keyProperty="id" keyColumn="id"> INSERT INTO image ( id, origin_img_path, expand_img_path, session_id, created_at ) VALUES (
-        nextval('session_id_seq'), #{imageInfoVO.originFilePath}, #{imageInfoVO.expandFilePath},#{imageInfoVO.sessionId}, now() ); </insert>
+  <insert id="insertKeyword" parameterType="io.storytailor.central.keyword.vo.KeywordVO"
+    useGeneratedKeys="true"
+    keyProperty="id" keyColumn="id"> INSERT INTO keyword ( id, type, keyword, session_id, created_at
+    ) VALUES ( nextval('session_id_seq'), #{keywordVO.type},
+    #{keywordVO.keyword},#{keywordVO.sessionId}, now() ); </insert>
+  <insert id="insertTempKeyword" parameterType="io.storytailor.central.keyword.vo.KeywordVO"
+    useGeneratedKeys="true"
+    keyProperty="id" keyColumn="id"> INSERT INTO temp_keyword ( id, type, keyword, session_id,
+    created_at ) VALUES ( nextval('session_id_seq'), #{keywordVO.type},
+    #{keywordVO.keyword},#{keywordVO.sessionId}, now() ); </insert>
+  <select id="selectKeyword" parameterType="Integer" resultMap="KeywordVO"> SELECT id, type AS type,
+    keyword AS keyword, session_id AS sessionId, story_id AS storyId FROM keyword WHERE session_id =
+    #{sessionId} ORDER BY created_at DESC LIMIT 1 </select>
+  <select id="selectTempKeyword" parameterType="Integer" resultMap="KeywordVO"> SELECT id, type AS
+    type, keyword AS keyword, session_id AS sessionId, story_id AS storyId FROM temp_keyword WHERE
+    session_id = #{sessionId} ORDER BY created_at DESC LIMIT 1 </select>
 </mapper>

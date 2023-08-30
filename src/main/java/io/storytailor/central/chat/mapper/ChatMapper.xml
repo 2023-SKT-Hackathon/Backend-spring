@@ -1,8 +1,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="io.storytailor.central.chat.mapper.ChatMapper">
-    <insert id="createSession" parameterType="io.storytailor.central.session.vo.SessionVO"
+    <insert id="insertChat" parameterType="io.storytailor.central.chat.vo.ChatVO"
         useGeneratedKeys="true"
-        keyProperty="sessionId" keyColumn="id"> INSERT INTO member ( id, created_at ) VALUES (
+        keyProperty="sessionId" keyColumn="id"> INSERT INTO chat ( id, created_at ) VALUES (
         nextval('session_id_seq'), now() ); </insert>
     <select id="getKeyword"></select>
 </mapper>
