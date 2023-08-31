@@ -205,6 +205,11 @@ public class ChatSVC {
     chatRequestVO.setHistory(chatHistoryVO);
     return chatRequestVO;
   }
+  
+  public List<ChatVO> getChatList(Integer sessionId) {
+    List<ChatVO> chatList = chatMapper.getChatList(sessionId);
+    return chatList;
+  }
 
   private ChatVO convertChatResponseVOToChatVO(ChatResponseVO chatResponseVO) {
     ChatVO chatVO = new ChatVO();

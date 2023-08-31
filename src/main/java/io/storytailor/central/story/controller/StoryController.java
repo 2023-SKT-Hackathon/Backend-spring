@@ -1,7 +1,12 @@
 package io.storytailor.central.story.controller;
 
 import io.storytailor.central.story.service.StorySVC;
+import io.storytailor.central.story.vo.StoryChatVO;
 import io.storytailor.central.story.vo.StoryRequestVO;
+import io.storytailor.central.story.vo.StoryVO;
+
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -18,26 +23,29 @@ public class StoryController {
   private StorySVC storySVC;
 
   @GetMapping("/api/story/list")
-  public ResponseEntity<?> getStoryList() {
-    return ResponseEntity.ok().body(null);
+  public ResponseEntity<List<StoryVO>> getStoryList() {
+    List<StoryVO> res = storySVC.getStoryList();
+    return ResponseEntity.ok().body(res);
   }
 
   @GetMapping("/api/story/{storyId}")
-  public ResponseEntity<?> getStory(@PathVariable Integer storyId) {
-    return ResponseEntity.ok().body(null);
+  public ResponseEntity<StoryVO> getStory(@PathVariable Integer storyId) {
+    StoryVO res = storySVC.getStoryById(storyId);
+    return ResponseEntity.ok().body(res);
   }
 
   @GetMapping("/api/story/{storyId}/chat")
-  public ResponseEntity<?> getStoryChat(@PathVariable Integer storyId) {
-    return ResponseEntity.ok().body(null);
+  public ResponseEntity<StoryChatVO> getStoryChat(@PathVariable Integer storyId) {
+    StoryChatVO res = storySVC.getStoryChatById(storyId);
+    return ResponseEntity.ok().body(res);
   }
 
   @PostMapping("/api/story")
-  public ResponseEntity<?> createStory(
+  public ResponseEntity<StoryVO> createStory(
     @RequestBody StoryRequestVO storyRequestVO
   ) {
-    storySVC.createStory(storyRequestVO);
-    return ResponseEntity.ok().body("Success");
+    StoryVO res = storySVC.createStory(storyRequestVO);
+    return ResponseEntity.ok().body(res);
   }
 
   @DeleteMapping("/api/story/{storyId}")

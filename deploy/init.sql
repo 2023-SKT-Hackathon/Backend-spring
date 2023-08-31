@@ -34,7 +34,7 @@ CREATE SEQUENCE story_id_seq INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 
 CREATE TABLE story (
     id INT NOT NULL DEFAULT nextval('story_id_seq' :: regclass),
     session_id INT NOT NULL,
-    cover_img_id INT NOT NULL,
+    cover_img_url TEXT,
     title TEXT,
     creater TEXT,
     lang TEXT,

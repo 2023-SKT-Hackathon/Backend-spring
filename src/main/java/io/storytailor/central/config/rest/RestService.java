@@ -83,9 +83,7 @@ public class RestService {
                 String key = iterator.next();
                 httpHeaders.add(key, headers.get(key));
             }
-        } else {
-            httpHeaders.setContentType(MediaType.APPLICATION_JSON);
-        }
+        } 
         if (accessToken != null) {
             httpHeaders.setBearerAuth(accessToken);
         }

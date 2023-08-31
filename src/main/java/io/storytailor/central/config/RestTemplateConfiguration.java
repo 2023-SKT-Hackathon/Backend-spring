@@ -112,6 +112,7 @@ public class RestTemplateConfiguration {
                                 // org.apache.http.conn.ConnectionPoolTimeoutException: Timeout waiting for
                                 // connection from pool
                                 .setConnectionRequestTimeout(timeoutConfig)
+                                .setResponseTimeout(timeoutConfig)
                                 .build();
 
                 return HttpClientBuilder

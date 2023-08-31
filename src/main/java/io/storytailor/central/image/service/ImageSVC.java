@@ -1,5 +1,8 @@
 package io.storytailor.central.image.service;
 
+import com.theokanning.openai.image.CreateImageEditRequest;
+import com.theokanning.openai.image.CreateImageRequest;
+import com.theokanning.openai.image.ImageResult;
 import com.theokanning.openai.service.OpenAiService;
 import io.storytailor.central.chat.vo.WhisperResponseVO;
 import io.storytailor.central.code.FileCode;
@@ -18,6 +21,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
@@ -127,56 +131,32 @@ public class ImageSVC {
     return imageMapper.selectImageInfo(sessionId);
   }
 
-  public String createAiImage(
+  public String createAndSaveAiImage(
     Integer sessionId,
-    File image,
-    File mask,
     String prompt,
-    String fileName
+    Integer pageIdx
   ) {
     try {
-      OpenAiService openAiService = new OpenAiService(openaiApiKey);
-
-      String originImg =
+      OpenAiService openAiService = new OpenAiService(openaiApiKey, Duration.ofSeconds(55));
+      if (pageIdx == 0) {
+        String expandImg =
         uploadPath +
         File.separator +
         sessionId.toString() +
         File.separator +
-        "origin" +
-        File.separator;
-      File importedOriginImg = new File(originImg);
-      openAiService.createImage(null);
-      openAiService.createImageEdit(null, image, mask);
-      Map<String, String> header = new HashMap<String, String>();
-      header.put("Content-Type", "multipart/form-data");
-      String url = defaultOpenaiApiUrl;
-      if (image == null && mask == null) {
-        url = url + generatePath;
+        "expand" +
+        File.separator + 
+        "origin_expand.png";
+        CreateImageEditRequest imageEditReq = new CreateImageEditRequest(prompt, 1, "1024x1024", "url", null);
+        ImageResult editRes = openAiService.createImageEdit(imageEditReq, expandImg, expandImg);
+        String editImg = editRes.getData().get(0).getUrl();
+        return downloadImageFromUrl(sessionId, FileCode.AI, editImg, pageIdx.toString());
       } else {
-        url = url + editPath;
+        CreateImageRequest imageReq = new CreateImageRequest(prompt, 1, "1024x1024",null,null);
+        ImageResult genRes = openAiService.createImage(imageReq);
+        String genImg = genRes.getData().get(0).getUrl();
+        return downloadImageFromUrl(sessionId, FileCode.AI, genImg, pageIdx.toString());
       }
-      MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-      body.add("prompt", prompt);
-      body.add("size", "1024x1024");
-      if (image != null) {
-        body.add("image", image);
-      }
-      if (mask != null) {
-        body.add("mask", mask);
-      }
-
-      ResponseEntity<ImageAiResponseVO> res = restService.post(
-        url,
-        null,
-        header,
-        body,
-        null,
-        openaiApiKey,
-        ImageAiResponseVO.class
-      );
-      /* Get Image Url */
-      String imageUrl = res.getBody().getData().get(0).get("url");
-      return imageUrl;
     } catch (Exception e) {
       log.error("Fail to Generate Image", e);
       return null;

@@ -29,13 +29,13 @@ openai-service:
 
 image:
   upload-path: /img/upload
-  # upload-path: C:\\img\\upload
+  # upload-path: C:\img\upload
   base-url: http://13.124.249.81:8080/ # webserver port
 
 http.pool:
   max.total: 200
   defaultMaxPerRoute: 100
-  connection.timeout: 5000
-  connection.request.timeout: 5000
-  read.timeout: 10000
+  connection.timeout: 100000
+  connection.request.timeout: 100000
+  read.timeout: 100000
   validate.after.inactivity: 2000
