@@ -2,6 +2,6 @@
 <mapper namespace="io.storytailor.central.session.mapper.SessionMapper">
     <insert id="createSession" parameterType="io.storytailor.central.session.vo.SessionVO"
         useGeneratedKeys="true"
-        keyProperty="sessionId" keyColumn="id"> INSERT INTO member ( id, created_at ) VALUES (
+        keyProperty="sessionId" keyColumn="id"> INSERT INTO session ( id, created_at ) VALUES (
         nextval('session_id_seq'), now() ); </insert>
 </mapper>

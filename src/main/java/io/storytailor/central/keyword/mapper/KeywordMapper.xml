@@ -1,26 +1,19 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="io.storytailor.central.keyword.mapper.KeywordMapper">
-  <resultMap id="KeywordVO" type="io.storytailor.central.keyword.vo.KeywordVO">
-    <result property="id" column="id" />
-    <result property="sessionId" column="session_id" />
-    <result property="type" column="type" />
-    <result property="keyword" column="keyword" />
-    <result property="storyId" column="story_id" />
-  </resultMap>
   <insert id="insertKeyword" parameterType="io.storytailor.central.keyword.vo.KeywordVO"
     useGeneratedKeys="true"
     keyProperty="id" keyColumn="id"> INSERT INTO keyword ( id, type, keyword, session_id, created_at
-    ) VALUES ( nextval('session_id_seq'), #{keywordVO.type},
+    ) VALUES ( nextval('keyword_id_seq'), #{keywordVO.type},
     #{keywordVO.keyword},#{keywordVO.sessionId}, now() ); </insert>
   <insert id="insertTempKeyword" parameterType="io.storytailor.central.keyword.vo.KeywordVO"
     useGeneratedKeys="true"
     keyProperty="id" keyColumn="id"> INSERT INTO temp_keyword ( id, type, keyword, session_id,
-    created_at ) VALUES ( nextval('session_id_seq'), #{keywordVO.type},
-    #{keywordVO.keyword},#{keywordVO.sessionId}, now() ); </insert>
-  <select id="selectKeyword" parameterType="Integer" resultMap="KeywordVO"> SELECT id, type AS type,
-    keyword AS keyword, session_id AS sessionId, story_id AS storyId FROM keyword WHERE session_id =
-    #{sessionId} ORDER BY created_at DESC </select>
-  <select id="selectTempKeyword" parameterType="Integer" resultMap="KeywordVO"> SELECT id, type AS
-    type, keyword AS keyword, session_id AS sessionId, story_id AS storyId FROM temp_keyword WHERE
-    session_id = #{sessionId} ORDER BY created_at DESC</select>
+    created_at ) VALUES ( nextval('temp_keyword_id_seq'), #{keywordVO.type}, #{keywordVO.keyword},
+    #{keywordVO.sessionId}, now() ); </insert>
+  <select id="selectKeyword" resultType="io.storytailor.central.keyword.vo.KeywordVO"> SELECT id,
+    type AS type, keyword AS keyword, session_id AS sessionId, story_id AS storyId FROM keyword
+    WHERE session_id = #{sessionId} ORDER BY created_at </select>
+  <select id="selectTempKeyword" resultType="io.storytailor.central.keyword.vo.KeywordVO"> SELECT
+    id, type AS type, keyword AS keyword, session_id AS sessionId, story_id AS storyId FROM
+    temp_keyword WHERE session_id = #{sessionId} ORDER BY created_at</select>
 </mapper>

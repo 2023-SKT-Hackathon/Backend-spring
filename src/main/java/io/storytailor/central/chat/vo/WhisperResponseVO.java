@@ -4,5 +4,7 @@ import lombok.Data;
 
 @Data
 public class WhisperResponseVO {
-    private String text;
+
+  private Integer sessionId;
+  private String text;
 }

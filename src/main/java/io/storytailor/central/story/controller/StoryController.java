@@ -2,7 +2,6 @@ package io.storytailor.central.story.controller;
 
 import io.storytailor.central.story.service.StorySVC;
 import io.storytailor.central.story.vo.StoryRequestVO;
-import jakarta.websocket.server.PathParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -20,17 +19,17 @@ public class StoryController {
 
   @GetMapping("/api/story/list")
   public ResponseEntity<?> getStoryList() {
-    return ResponseEntity.ok().body(storySVC.getStoryList());
+    return ResponseEntity.ok().body(null);
   }
 
   @GetMapping("/api/story/{storyId}")
   public ResponseEntity<?> getStory(@PathVariable Integer storyId) {
-    return ResponseEntity.ok().body(storySVC.getStory(storyId));
+    return ResponseEntity.ok().body(null);
   }
 
   @GetMapping("/api/story/{storyId}/chat")
   public ResponseEntity<?> getStoryChat(@PathVariable Integer storyId) {
-    return ResponseEntity.ok().body(storySVC.getStoryChat(storyId));
+    return ResponseEntity.ok().body(null);
   }
 
   @PostMapping("/api/story")

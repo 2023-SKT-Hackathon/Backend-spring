@@ -3,7 +3,6 @@ package io.storytailor.central.chat.controller;
 import io.storytailor.central.chat.service.ChatSVC;
 import io.storytailor.central.chat.vo.ChatVO;
 import io.storytailor.central.chat.vo.WhisperResponseVO;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -22,10 +21,13 @@ public class ChatController {
 
   @PostMapping("/api/chat/voice")
   public ResponseEntity<WhisperResponseVO> voice(
+    @RequestParam("sessionId") Integer sessionId,
     @RequestParam("voiceFile") MultipartFile voiceFile
   ) {
     /* vaildation mp3 file */
-    return ResponseEntity.ok().body(chatSVC.convertVoiceToText(voiceFile));
+    return ResponseEntity
+      .ok()
+      .body(chatSVC.convertVoiceToText(sessionId, voiceFile));
   }
 
   @GetMapping("/api/chat/{sessionId}")

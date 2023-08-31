@@ -1,7 +1,8 @@
 package io.storytailor.central.image.service;
 
+import com.theokanning.openai.service.OpenAiService;
 import io.storytailor.central.chat.vo.WhisperResponseVO;
-import io.storytailor.central.code.ImageCode;
+import io.storytailor.central.code.FileCode;
 import io.storytailor.central.config.rest.RestService;
 import io.storytailor.central.image.mapper.ImageMapper;
 import io.storytailor.central.image.vo.ImageAiResponseVO;
@@ -69,21 +70,13 @@ public class ImageSVC {
     } else {
       imageInfoVO.setSessionId(sessionId);
     }
-    String resOriginPath = saveDiskImage(
-      sessionId,
-      ImageCode.ORIGIN,
-      originFile
-    );
+    String resOriginPath = saveDiskFile(sessionId, FileCode.ORIGIN, originFile);
     if (resOriginPath == null) {
       return null;
     } else {
       imageInfoVO.setOriginFilePath(baseUrl + resOriginPath);
     }
-    String resExpandPath = saveDiskImage(
-      sessionId,
-      ImageCode.EXPAND,
-      expandFile
-    );
+    String resExpandPath = saveDiskFile(sessionId, FileCode.EXPAND, expandFile);
     if (resExpandPath == null) {
       return null;
     } else {
@@ -93,9 +86,9 @@ public class ImageSVC {
     return imageInfoVO;
   }
 
-  public String saveDiskImage(
+  public String saveDiskFile(
     Integer sessionId,
-    ImageCode imgType,
+    FileCode fileType,
     MultipartFile file
   ) {
     Path copyOfLocation = Paths.get(
@@ -103,7 +96,7 @@ public class ImageSVC {
       File.separator +
       sessionId.toString() +
       File.separator +
-      imgType.getCode() +
+      fileType.getCode() +
       File.separator +
       StringUtils.cleanPath(file.getOriginalFilename())
     );
@@ -116,13 +109,13 @@ public class ImageSVC {
       return (
         sessionId.toString() +
         File.separator +
-        imgType.getCode() +
+        fileType.getCode() +
         File.separator +
         StringUtils.cleanPath(file.getOriginalFilename())
       );
     } catch (IOException e) {
       log.error(
-        "Fail to save image : {}",
+        "Fail to save file : {}",
         StringUtils.cleanPath(file.getOriginalFilename()),
         e
       );
@@ -141,6 +134,15 @@ public class ImageSVC {
     String fileName
   ) {
     try {
+      OpenAiService openAiService = new OpenAiService(openaiApiKey);
+
+      String originImg =
+        baseUrl +
+        File.separator +
+        saveDiskFile(sessionId, FileCode.AUDIO, voiceFile);
+      File convertFile = new File(audioPath);
+      openAiService.createImage(null);
+      openAiService.createImageEdit(null, image, mask);
       Map<String, String> header = new HashMap<String, String>();
       header.put("Content-Type", "multipart/form-data");
       String url = defaultOpenaiApiUrl;
@@ -179,7 +181,7 @@ public class ImageSVC {
 
   public String downloadImageFromUrl(
     Integer sessionId,
-    ImageCode imgType,
+    FileCode imgType,
     String url,
     String fileName
   ) {
@@ -229,6 +231,7 @@ public class ImageSVC {
       Files.createDirectories(Paths.get(path + "/origin"));
       Files.createDirectories(Paths.get(path + "/expand"));
       Files.createDirectories(Paths.get(path + "/ai"));
+      Files.createDirectories(Paths.get(path + "/audio"));
       return true;
     } catch (Exception e) {
       log.error("Fail to Create Dict : {}", uploadPath, e);

@@ -2,17 +2,6 @@
 <mapper namespace="io.storytailor.central.story.mapper.StoryMapper">
   <resultMap id="StoryVO" type="io.storytailor.central.story.vo.StoryVO">
     <result property="id" column="pipeline_id" />
-
   </resultMap>
-    <insert id="createSession" parameterType="io.storytailor.central.image.vo.ImageInfoVO"
-        useGeneratedKeys="true"
-        keyProperty="id" keyColumn="id"> INSERT INTO image ( id, origin_img_path, expand_img_path, session_id, created_at ) VALUES (
-        nextval('session_id_seq'), #{imageInfoVO.originFilePath}, #{imageInfoVO.expandFilePath},#{imageInfoVO.sessionId}, now() ); </insert>
-    <select id="selectImageInfo" parameterType="Integer" resultMap="ImageInfoVO"> 
-        SELECT id, origin_img_path AS originFilePath, expand_img_path AS expandFilePath, session_id AS sessionId, created_at AS createdAt 
-        FROM image WHERE session_id = #{sessionId} ORDER BY created_at DESC LIMIT 1
-    </select>
-    <delete id="deleteStory">
-        DELETE FROM story WHERE story_id = #{story_id}
-    </delete>
+  <delete id="deleteStory"> DELETE FROM story WHERE story_id = #{story_id} </delete>
 </mapper> 

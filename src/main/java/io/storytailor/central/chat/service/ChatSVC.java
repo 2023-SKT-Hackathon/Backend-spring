@@ -1,5 +1,8 @@
 package io.storytailor.central.chat.service;
 
+import com.theokanning.openai.audio.CreateTranscriptionRequest;
+import com.theokanning.openai.audio.TranscriptionResult;
+import com.theokanning.openai.service.OpenAiService;
 import io.storytailor.central.chat.mapper.ChatMapper;
 import io.storytailor.central.chat.vo.ChatHistoryVO;
 import io.storytailor.central.chat.vo.ChatRequestVO;
@@ -8,9 +11,13 @@ import io.storytailor.central.chat.vo.ChatVO;
 import io.storytailor.central.chat.vo.WhisperResponseVO;
 import io.storytailor.central.code.ChatProgressCode;
 import io.storytailor.central.code.ChatTypeCode;
+import io.storytailor.central.code.FileCode;
 import io.storytailor.central.config.rest.RestService;
+import io.storytailor.central.image.service.ImageSVC;
 import io.storytailor.central.keyword.service.KeywordSVC;
 import io.storytailor.central.keyword.vo.KeywordVO;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,13 +27,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @Service
 public class ChatSVC {
+
+  @Value("${image.upload-path}")
+  private String baseUrl;
 
   @Value("${flask.base-url}")
   private String flaskBaseUrl;
@@ -52,27 +60,50 @@ public class ChatSVC {
   @Autowired
   private KeywordSVC keywordSVC;
 
-  public WhisperResponseVO convertVoiceToText(MultipartFile voiceFile) {
+  @Autowired
+  ImageSVC imageSVC;
+
+  public WhisperResponseVO convertVoiceToText(
+    Integer sessionId,
+    MultipartFile voiceFile
+  ) {
     try {
-      Map<String, String> header = new HashMap<String, String>();
-      header.put("Content-Type", "multipart/form-data");
-      MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-      body.add("file", voiceFile);
-      body.add("model", audioModel);
-      ResponseEntity<WhisperResponseVO> res = restService.post(
-        defaultOpenaiApiUrl + audioPath,
+      OpenAiService openAiService = new OpenAiService(openaiApiKey);
+      String audioPath =
+        baseUrl +
+        File.separator +
+        imageSVC.saveDiskFile(sessionId, FileCode.AUDIO, voiceFile);
+      File convertFile = new File(audioPath);
+      CreateTranscriptionRequest request = new CreateTranscriptionRequest(
+        audioModel,
         null,
-        header,
-        body,
         null,
-        openaiApiKey,
-        WhisperResponseVO.class
+        null,
+        "ko"
       );
-      return res.getBody();
+      TranscriptionResult res = openAiService.createTranscription(
+        request,
+        convertFile
+      );
+      log.info("Convert Voice to Text Response: " + res.getText());
+      WhisperResponseVO whisperResponseVO = new WhisperResponseVO();
+      if (res != null) {
+        whisperResponseVO.setSessionId(sessionId);
+        whisperResponseVO.setText(res.getText());
+        return whisperResponseVO;
+      }
+      return whisperResponseVO;
     } catch (Exception e) {
       log.error("Fail to Convert Voice to Text", e);
       return null;
     }
+  }
+
+  public File multipartFileToFile(MultipartFile multipartFile)
+    throws IOException {
+    File file = new File(multipartFile.getOriginalFilename());
+    multipartFile.transferTo(file);
+    return file;
   }
 
   public ChatVO getInitAiChat(Integer sessionId) {
@@ -108,8 +139,6 @@ public class ChatSVC {
   }
 
   public ChatVO sendAiChat(Integer sessionId, ChatVO chatVO) {
-    /* Insert Chat Hist */
-    chatMapper.insertChat(chatVO);
     /* Send Ai question */
     ChatRequestVO chatRequestVO = convertChatVOToChatRequestVO(chatVO);
     log.info("User Chat Request: " + chatRequestVO.toString());
@@ -126,10 +155,12 @@ public class ChatSVC {
     ChatResponseVO responseVO = res.getBody();
     ChatVO resChatVO = convertChatResponseVOToChatVO(responseVO);
     if (responseVO != null) {
+      /* Insert Chat Hist */
+      chatMapper.insertChat(chatVO);
       /* save AI msg in Database */
       chatMapper.insertChat(resChatVO);
       /* keyword save */
-      if (responseVO.getStatus().equals("True")) {
+      if (responseVO.getStatus().equals("true")) {
         /* Extract Keyword */
         for (String keyword : responseVO.getKeyword()) {
           KeywordVO keywordVO = new KeywordVO();
@@ -181,7 +212,7 @@ public class ChatSVC {
     chatVO.setMsgNum(Integer.parseInt(chatResponseVO.getMsgNum()));
     chatVO.setMsgType(ChatTypeCode.AI.getCode());
     chatVO.setText(chatResponseVO.getText());
-    if (chatResponseVO.getStatus().equals("True")) {
+    if (chatResponseVO.getStatus().equals("true")) {
       chatVO.setProgress(ChatProgressCode.COMPLETE.getCode());
     } else {
       chatVO.setProgress(ChatProgressCode.DOING.getCode());

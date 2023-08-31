@@ -1,17 +1,11 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="io.storytailor.central.chat.mapper.ChatMapper">
-    <resultMap id="ChatVO" type="io.storytailor.central.chat.vo.ChatVO">
-        <result property="id" column="id" />
-        <result property="sessionId" column="session_id" />
-        <result property="msgNum" column="msg_num" />
-        <result property="msgType" column="msg_type" />
-        <result property="text" column="text" />
-    </resultMap>
     <insert id="insertChat" parameterType="io.storytailor.central.chat.vo.ChatVO"
         useGeneratedKeys="true"
-        keyProperty="sessionId" keyColumn="id"> INSERT INTO chat ( id, session_id, msg_num, msg_type, text, created_at ) VALUES (
-        nextval('session_id_seq'), #{chatVO.sessionId}, #{chatVO.msgNum}, #{chatVO.msgType}, #{chatVO.text}, now() ); </insert>
-        <select id="getChatList" parameterType="Integer" resultMap="ChatVO"> SELECT id, msg_num AS
-            msgNum, msg_type AS msgType, session_id AS sessionId, FROM chat WHERE
-            session_id = #{sessionId} ORDER BY msg_num DESC</select>
+        keyProperty="id" keyColumn="id"> INSERT INTO chat ( id, session_id, msg_num, msg_type, text,
+        created_at ) VALUES ( nextval('session_id_seq'), #{chatVO.sessionId}, #{chatVO.msgNum},
+        #{chatVO.msgType}, #{chatVO.text}, now() ); </insert>
+    <select id="getChatList" resultType="io.storytailor.central.chat.vo.ChatVO"> SELECT id, msg_num
+        AS msgNum, msg_type AS msgType, session_id AS sessionId, text FROM chat WHERE session_id =
+        #{sessionId} ORDER BY msg_num</select>
 </mapper>
