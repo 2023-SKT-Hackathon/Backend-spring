@@ -10,6 +10,10 @@ spring:
     jdbcUrl: jdbc:postgresql://storytailor-db.c1dmi7dj6oou.ap-northeast-2.rds.amazonaws.com:5432/storytailor
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
 
 server:
   port: 8008
