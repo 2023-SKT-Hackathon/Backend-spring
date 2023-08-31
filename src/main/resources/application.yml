@@ -28,8 +28,8 @@ openai-service:
     generate-path: /images/generations
 
 image:
-  # upload-path: /img/upload
-  upload-path: C:\\img\\upload
+  upload-path: /img/upload
+  # upload-path: C:\\img\\upload
   base-url: http://13.124.249.81:8080/ # webserver port
 
 http.pool:

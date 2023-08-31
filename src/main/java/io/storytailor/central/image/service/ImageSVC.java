@@ -128,6 +128,7 @@ public class ImageSVC {
   }
 
   public String createAiImage(
+    Integer sessionId,
     File image,
     File mask,
     String prompt,
@@ -137,10 +138,13 @@ public class ImageSVC {
       OpenAiService openAiService = new OpenAiService(openaiApiKey);
 
       String originImg =
-        baseUrl +
+        uploadPath +
         File.separator +
-        saveDiskFile(sessionId, FileCode.AUDIO, voiceFile);
-      File convertFile = new File(audioPath);
+        sessionId.toString() +
+        File.separator +
+        "origin" +
+        File.separator;
+      File importedOriginImg = new File(originImg);
       openAiService.createImage(null);
       openAiService.createImageEdit(null, image, mask);
       Map<String, String> header = new HashMap<String, String>();

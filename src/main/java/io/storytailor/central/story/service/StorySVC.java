@@ -14,7 +14,6 @@ import io.storytailor.central.story.vo.StoryAiRequestVO;
 import io.storytailor.central.story.vo.StoryAiResponseVO;
 import io.storytailor.central.story.vo.StoryRequestVO;
 import io.storytailor.central.story.vo.StoryVO;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -78,24 +77,23 @@ public class StorySVC {
     );
     log.info("AI Chat Response: " + res.getBody());
     storyAiResponseVO = res.getBody();
-    if (storyAiResponseVO != null){
-        storyVO.setTitle(storyAiResponseVO.getStory().get(0));
-        for (int idx = 0 ; idx < storyAiResponseVO.getImgPrompt().size(); idx++){
-            PageVO pageVO = new PageVO();
-            pageVO.setPageNo(idx);
-            pageVO.setPageContent(storyAiResponseVO.getStory().get(idx + 1));
-            /* Create AI Image */
-            imageSVC.createAiImage(null, null, storyAiResponseVO.getImgPrompt().get(idx), storyAiResponseVO.getImgPrompt().get(idx));
-            storyVO.getPageList().add(pageVO);
-        }
-        for (String imgPrompt : storyAiResponseVO.getImgPrompt()) {
-            PageVO pageVO = new PageVO();
-            imageSVC.createAiImage(null, null, imgPrompt, imgPrompt)
+    if (storyAiResponseVO != null) {
+      storyVO.setTitle(storyAiResponseVO.getStory().get(0));
+      for (int idx = 0; idx < storyAiResponseVO.getImgPrompt().size(); idx++) {
+        PageVO pageVO = new PageVO();
+        pageVO.setPageNo(idx);
+        pageVO.setPageContent(storyAiResponseVO.getStory().get(idx + 1));
+        /* Create AI Image */
+        // imageSVC.createAiImage(null, null, storyAiResponseVO.getImgPrompt().get(idx), storyAiResponseVO.getImgPrompt().get(idx));
+        // storyVO.getPageList().add(pageVO);
+      }
+      for (String imgPrompt : storyAiResponseVO.getImgPrompt()) {
+        PageVO pageVO = new PageVO();
+        // imageSVC.createAiImage(null, null, imgPrompt, imgPrompt)
 
-            storyVO.setImgPrompt(imgPrompt);
-        }
+        // storyVO.setImgPrompt(imgPrompt);
+      }
     }
-
     /* 결과로 가져온 데이터로 이미지 생성 요청 */
     /* Url로 디스크에 저장 */
     /* insert data in db */
