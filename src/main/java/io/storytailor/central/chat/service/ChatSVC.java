@@ -112,6 +112,14 @@ public class ChatSVC {
     chatRequestVO.setMsgType(ChatTypeCode.USER.getCode());
     chatRequestVO.setSessionId(sessionId);
     chatRequestVO.setText("START");
+    /* Insert DB */
+          ChatVO chatVOToDB = new ChatVO();
+      chatVOToDB.setSessionId(sessionId);
+      chatVOToDB.setMsgNum(0);
+      chatVOToDB.setMsgType(ChatTypeCode.USER.getCode());
+      chatVOToDB.setText("START");
+      chatVOToDB.setProgress(ChatProgressCode.DOING.getCode());
+    chatMapper.insertChat(chatVOToDB);
     log.info("User Request First Chat Request: " + sessionId.toString());
     /* Send Ai question init */
     ResponseEntity<ChatResponseVO> res = restService.post(
@@ -160,7 +168,7 @@ public class ChatSVC {
       /* save AI msg in Database */
       chatMapper.insertChat(resChatVO);
       /* keyword save */
-      if (responseVO.getStatus().equals("true")) {
+      if (responseVO.getStatus().toUpperCase().equals("TRUE")) {
         /* Extract Keyword */
         for (String keyword : responseVO.getKeyword()) {
           KeywordVO keywordVO = new KeywordVO();
@@ -217,7 +225,7 @@ public class ChatSVC {
     chatVO.setMsgNum(Integer.parseInt(chatResponseVO.getMsgNum()));
     chatVO.setMsgType(ChatTypeCode.AI.getCode());
     chatVO.setText(chatResponseVO.getText());
-    if (chatResponseVO.getStatus().equals("true")) {
+    if (chatResponseVO.getStatus().toUpperCase().equals("TRUE")) {
       chatVO.setProgress(ChatProgressCode.COMPLETE.getCode());
     } else {
       chatVO.setProgress(ChatProgressCode.DOING.getCode());
