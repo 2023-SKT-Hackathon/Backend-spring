@@ -18,6 +18,7 @@ import io.storytailor.central.keyword.service.KeywordSVC;
 import io.storytailor.central.keyword.vo.KeywordVO;
 import java.io.File;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -68,7 +69,10 @@ public class ChatSVC {
     MultipartFile voiceFile
   ) {
     try {
-      OpenAiService openAiService = new OpenAiService(openaiApiKey);
+      OpenAiService openAiService = new OpenAiService(
+        openaiApiKey,
+        Duration.ofSeconds(55)
+      );
       String audioPath =
         baseUrl +
         File.separator +
@@ -113,12 +117,12 @@ public class ChatSVC {
     chatRequestVO.setSessionId(sessionId);
     chatRequestVO.setText("START");
     /* Insert DB */
-          ChatVO chatVOToDB = new ChatVO();
-      chatVOToDB.setSessionId(sessionId);
-      chatVOToDB.setMsgNum(0);
-      chatVOToDB.setMsgType(ChatTypeCode.USER.getCode());
-      chatVOToDB.setText("START");
-      chatVOToDB.setProgress(ChatProgressCode.DOING.getCode());
+    ChatVO chatVOToDB = new ChatVO();
+    chatVOToDB.setSessionId(sessionId);
+    chatVOToDB.setMsgNum(0);
+    chatVOToDB.setMsgType(ChatTypeCode.USER.getCode());
+    chatVOToDB.setText("START");
+    chatVOToDB.setProgress(ChatProgressCode.DOING.getCode());
     chatMapper.insertChat(chatVOToDB);
     log.info("User Request First Chat Request: " + sessionId.toString());
     /* Send Ai question init */
@@ -213,7 +217,7 @@ public class ChatSVC {
     chatRequestVO.setHistory(chatHistoryVO);
     return chatRequestVO;
   }
-  
+
   public List<ChatVO> getChatList(Integer sessionId) {
     List<ChatVO> chatList = chatMapper.getChatList(sessionId);
     return chatList;
