@@ -4,15 +4,14 @@ import com.theokanning.openai.image.CreateImageEditRequest;
 import com.theokanning.openai.image.CreateImageRequest;
 import com.theokanning.openai.image.ImageResult;
 import com.theokanning.openai.service.OpenAiService;
-import io.storytailor.central.chat.vo.WhisperResponseVO;
 import io.storytailor.central.code.FileCode;
-import io.storytailor.central.config.rest.RestService;
 import io.storytailor.central.image.mapper.ImageMapper;
-import io.storytailor.central.image.vo.ImageAiResponseVO;
 import io.storytailor.central.image.vo.ImageInfoVO;
+import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,15 +21,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.Duration;
-import java.util.HashMap;
-import java.util.Map;
+import javax.imageio.ImageIO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -57,9 +52,6 @@ public class ImageSVC {
   private String generatePath;
 
   @Autowired
-  private RestService restService;
-
-  @Autowired
   private ImageMapper imageMapper;
 
   public ImageInfoVO uploadImage(
@@ -75,6 +67,10 @@ public class ImageSVC {
       imageInfoVO.setSessionId(sessionId);
     }
     String resOriginPath = saveDiskFile(sessionId, FileCode.ORIGIN, originFile);
+    /* Convert Image Extension */
+    if (originFile.getOriginalFilename().endsWith(".jpg")) {
+      resOriginPath = convertImgJpgToPng(sessionId, originFile);
+    }
     if (resOriginPath == null) {
       return null;
     } else {
@@ -137,25 +133,54 @@ public class ImageSVC {
     Integer pageIdx
   ) {
     try {
-      OpenAiService openAiService = new OpenAiService(openaiApiKey, Duration.ofSeconds(55));
+      OpenAiService openAiService = new OpenAiService(
+        openaiApiKey,
+        Duration.ofSeconds(55)
+      );
       if (pageIdx == 0) {
         String expandImg =
-        uploadPath +
-        File.separator +
-        sessionId.toString() +
-        File.separator +
-        "expand" +
-        File.separator + 
-        "origin_expand.png";
-        CreateImageEditRequest imageEditReq = new CreateImageEditRequest(prompt, 1, "1024x1024", "url", null);
-        ImageResult editRes = openAiService.createImageEdit(imageEditReq, expandImg, expandImg);
+          uploadPath +
+          File.separator +
+          sessionId.toString() +
+          File.separator +
+          "expand" +
+          File.separator +
+          "origin_expand.png";
+        CreateImageEditRequest imageEditReq = new CreateImageEditRequest(
+          prompt,
+          1,
+          "1024x1024",
+          "url",
+          null
+        );
+        ImageResult editRes = openAiService.createImageEdit(
+          imageEditReq,
+          expandImg,
+          expandImg
+        );
         String editImg = editRes.getData().get(0).getUrl();
-        return downloadImageFromUrl(sessionId, FileCode.AI, editImg, pageIdx.toString());
+        return downloadImageFromUrl(
+          sessionId,
+          FileCode.AI,
+          editImg,
+          pageIdx.toString()
+        );
       } else {
-        CreateImageRequest imageReq = new CreateImageRequest(prompt, 1, "1024x1024",null,null);
+        CreateImageRequest imageReq = new CreateImageRequest(
+          prompt,
+          1,
+          "1024x1024",
+          null,
+          null
+        );
         ImageResult genRes = openAiService.createImage(imageReq);
         String genImg = genRes.getData().get(0).getUrl();
-        return downloadImageFromUrl(sessionId, FileCode.AI, genImg, pageIdx.toString());
+        return downloadImageFromUrl(
+          sessionId,
+          FileCode.AI,
+          genImg,
+          pageIdx.toString()
+        );
       }
     } catch (Exception e) {
       log.error("Fail to Generate Image", e);
@@ -223,5 +248,43 @@ public class ImageSVC {
     }
   }
 
-  private void convertImgJpgToPng() {}
+  public String convertImgJpgToPng(
+    Integer sessionId,
+    MultipartFile originFile
+  ) {
+    try {
+      String basePath =
+        uploadPath +
+        File.separator +
+        sessionId.toString() +
+        File.separator +
+        "origin" +
+        File.separator;
+      FileInputStream inputStream = new FileInputStream(
+        basePath + StringUtils.cleanPath(originFile.getOriginalFilename())
+      );
+      FileOutputStream outputStream = new FileOutputStream(
+        basePath + "origin.png"
+      );
+      // reads input image from file
+      BufferedImage inputImage = ImageIO.read(inputStream);
+
+      // writes to the output image in specified format
+      ImageIO.write(inputImage, "png", outputStream);
+
+      // needs to close the streams
+      outputStream.close();
+      inputStream.close();
+      return (
+        sessionId.toString() +
+        File.separator +
+        "origin" +
+        File.separator +
+        "origin.png"
+      );
+    } catch (IOException e) {
+      e.printStackTrace();
+      return null;
+    }
+  }
 }
