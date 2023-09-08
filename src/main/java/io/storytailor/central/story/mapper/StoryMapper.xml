@@ -1,24 +1,25 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="io.storytailor.central.story.mapper.StoryMapper">
-  <insert id="insertStory" parameterType="io.storytailor.central.story.vo.StoryVO" useGeneratedKeys="true"
-  keyProperty="id" keyColumn="id">
-    INSERT INTO story (session_id, cover_img_url, title, creater, lang, created_at)
-    VALUES (#{storyVO.sessionId}, #{storyVO.coverImg}, #{storyVO.title}, #{storyVO.creater}, #{storyVO.lang}, now())
-  </insert>
-  <insert id="insertPage" parameterType="io.storytailor.central.story.vo.PageVO" useGeneratedKeys="true"
-  keyProperty="id" keyColumn="id">
-    INSERT INTO page (page_no, page_img_path, page_content, story_id, created_at)
-    VALUES (#{pageVO.pageNo}, #{pageVO.pageImg}, #{pageVO.pageContent}, #{pageVO.storyId}, now())
-  </insert>
-  <select id="selectStoryList" resultType="io.storytailor.central.story.vo.StoryVO">
-    SELECT id, session_id AS sessionId, cover_img_url AS coverImg, title, creater, lang, created_at AS createdAt FROM story
-  </select>
-  <select id="selectStory" parameterType="Integer" resultType="io.storytailor.central.story.vo.StoryVO">
-    SELECT id, session_id AS sessionId, cover_img_url AS coverImg, title, creater, lang, created_at AS createdAt FROM story WHERE id = #{storyId}
-  </select>
-  <select id="selectPageList" parameterType="Integer" resultType="io.storytailor.central.story.vo.PageVO">
-    SELECT id, story_id AS storyId, page_no AS pageNo, page_img_path AS pageImg, page_content AS pageContent, created_at AS createdAt FROM page WHERE story_id = #{storyId}
-  </select>
+  <insert id="insertStory" parameterType="io.storytailor.central.story.vo.StoryVO"
+    useGeneratedKeys="true"
+    keyProperty="id" keyColumn="id"> INSERT INTO story (session_id, cover_img_url, title, creater,
+    lang, created_at) VALUES (#{storyVO.sessionId}, #{storyVO.coverImg}, #{storyVO.title},
+    #{storyVO.creater}, #{storyVO.lang}, now()) </insert>
+  <insert id="insertPage" parameterType="io.storytailor.central.story.vo.PageVO"
+    useGeneratedKeys="true"
+    keyProperty="id" keyColumn="id"> INSERT INTO page (page_no, page_img_path, page_content,
+    story_id, created_at) VALUES (#{pageVO.pageNo}, #{pageVO.pageImg}, #{pageVO.pageContent},
+    #{pageVO.storyId}, now()) </insert>
+  <select id="selectStoryList" resultType="io.storytailor.central.story.vo.StoryVO"> SELECT id,
+    session_id AS sessionId, cover_img_url AS coverImg, title, creater, lang, created_at AS
+    createdAt FROM story </select>
+  <select id="selectStory" resultType="io.storytailor.central.story.vo.StoryVO"> SELECT id,
+    session_id AS sessionId, cover_img_url AS coverImg, title, creater, lang, created_at AS
+    createdAt FROM story WHERE id = #{storyId} AND lang = #{lang} </select>
+  <select id="selectPageList" parameterType="Integer"
+    resultType="io.storytailor.central.story.vo.PageVO"> SELECT id, story_id AS storyId, page_no AS
+    pageNo, page_img_path AS pageImg, page_content AS pageContent, created_at AS createdAt FROM page
+    WHERE story_id = #{storyId} </select>
   <delete id="deleteStory" parameterType="Integer"> DELETE FROM story WHERE id = #{storyId} </delete>
   <delete id="deletePage" parameterType="Integer"> DELETE FROM page WHERE story_id = #{storyId} </delete>
 </mapper> 

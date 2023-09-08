@@ -4,9 +4,7 @@ import io.storytailor.central.story.service.StorySVC;
 import io.storytailor.central.story.vo.StoryChatVO;
 import io.storytailor.central.story.vo.StoryRequestVO;
 import io.storytailor.central.story.vo.StoryVO;
-
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -15,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class StoryController {
@@ -29,13 +28,21 @@ public class StoryController {
   }
 
   @GetMapping("/api/story/{storyId}")
-  public ResponseEntity<StoryVO> getStory(@PathVariable Integer storyId) {
-    StoryVO res = storySVC.getStoryById(storyId);
+  public ResponseEntity<StoryVO> getStory(
+    @PathVariable Integer storyId,
+    @RequestParam("lang") String lang
+  ) {
+    if (lang == null) {
+      lang = "ko";
+    }
+    StoryVO res = storySVC.getStoryById(storyId, lang);
     return ResponseEntity.ok().body(res);
   }
 
   @GetMapping("/api/story/{storyId}/chat")
-  public ResponseEntity<StoryChatVO> getStoryChat(@PathVariable Integer storyId) {
+  public ResponseEntity<StoryChatVO> getStoryChat(
+    @PathVariable Integer storyId
+  ) {
     StoryChatVO res = storySVC.getStoryChatById(storyId);
     return ResponseEntity.ok().body(res);
   }

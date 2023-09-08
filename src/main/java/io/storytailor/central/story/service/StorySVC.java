@@ -1,8 +1,6 @@
 package io.storytailor.central.story.service;
 
 import io.storytailor.central.chat.service.ChatSVC;
-import io.storytailor.central.chat.vo.ChatRequestVO;
-import io.storytailor.central.chat.vo.ChatResponseVO;
 import io.storytailor.central.chat.vo.ChatVO;
 import io.storytailor.central.config.rest.RestService;
 import io.storytailor.central.image.service.ImageSVC;
@@ -15,7 +13,7 @@ import io.storytailor.central.story.vo.StoryAiResponseVO;
 import io.storytailor.central.story.vo.StoryChatVO;
 import io.storytailor.central.story.vo.StoryRequestVO;
 import io.storytailor.central.story.vo.StoryVO;
-
+import io.storytailor.central.story.vo.TranslateVO;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +26,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 public class StorySVC {
+
   @Value("${image.base-url}")
   private String baseUrl;
 
@@ -55,7 +54,13 @@ public class StorySVC {
     storyVO.setSessionId(storyRequestVO.getSessionId());
     storyVO.setCreater(storyRequestVO.getCreater());
     /* Get Cover Image Info */
-    String coverImgPath = baseUrl + storyRequestVO.getSessionId().toString() + File.separator + "origin" +File.separator + "origin.png";
+    String coverImgPath =
+      baseUrl +
+      storyRequestVO.getSessionId().toString() +
+      File.separator +
+      "origin" +
+      File.separator +
+      "origin.png";
     storyVO.setCoverImg(coverImgPath);
     //TODO language Set Up
     storyVO.setLang("ko");
@@ -99,7 +104,11 @@ public class StorySVC {
         pageVO.setPageNo(idx);
         pageVO.setPageContent(storyAiResponseVO.getStory().get(idx + 1));
         /* Create AI Image */
-        String path = imageSVC.createAndSaveAiImage(storyRequestVO.getSessionId(), storyAiResponseVO.getImgPrompt().get(idx), idx);
+        String path = imageSVC.createAndSaveAiImage(
+          storyRequestVO.getSessionId(),
+          storyAiResponseVO.getImgPrompt().get(idx),
+          idx
+        );
         pageVO.setPageImg(baseUrl + path);
         /* insert page data in db */
         storyMapper.insertPage(pageVO);
@@ -114,16 +123,62 @@ public class StorySVC {
     return storyMapper.selectStoryList();
   }
 
-  public StoryVO getStoryById(Integer storyId) {
-    StoryVO storyVO = storyMapper.selectStory(storyId);
-    List<PageVO> pageList = storyMapper.selectPageList(storyId);
-    storyVO.setPages(pageList);
-    return storyVO;
+  public StoryVO getStoryById(Integer storyId, String lang) {
+    /* if already exist Database */
+    StoryVO storyVO = storyMapper.selectStory(storyId, lang);
+    if (storyVO != null) {
+      List<PageVO> pageList = storyMapper.selectPageList(storyId);
+      storyVO.setPages(pageList);
+      return storyVO;
+    } else {
+      StoryVO storyKoVO = storyMapper.selectStory(storyId, "ko");
+      List<PageVO> pageKoList = storyMapper.selectPageList(storyId);
+      storyKoVO.setPages(pageKoList);
+      TranslateVO translateVO = new TranslateVO();
+      List<String> storyPages = new ArrayList<>();
+      for (PageVO pageVO : storyKoVO.getPages()) {
+        storyPages.add(pageVO.getPageContent());
+      }
+      translateVO.setLang(lang);
+      translateVO.setStory(storyPages);
+
+      log.info("User Translate Request: " + translateVO.toString());
+      ResponseEntity<TranslateVO> res = restService.post(
+        flaskBaseUrl + "translate",
+        null,
+        null,
+        translateVO,
+        null,
+        null,
+        TranslateVO.class
+      );
+      log.info("AI Story Response: " + res.getBody());
+      TranslateVO translateResponseVO = res.getBody();
+
+      if (translateResponseVO != null) {
+        storyKoVO.setLang(lang);
+        storyKoVO.setTitle(translateVO.getStory().get(0));
+        storyMapper.insertStory(storyKoVO);
+        List<PageVO> pageList = new ArrayList<>();
+        for (int idx = 1; idx < translateResponseVO.getStory().size(); idx++) {
+          PageVO pageVO = new PageVO();
+          pageVO.setSessionId(storyKoVO.getSessionId());
+          pageVO.setStoryId(storyKoVO.getId());
+          pageVO.setPageNo(idx - 1);
+          pageVO.setPageContent(translateResponseVO.getStory().get(idx));
+          pageVO.setPageImg(storyKoVO.getPages().get(idx - 1).getPageImg());
+          storyMapper.insertPage(pageVO);
+          pageList.add(pageVO);
+        }
+        storyKoVO.setPages(pageList);
+        return storyKoVO;
+      } else return null;
+    }
   }
 
-  public StoryChatVO getStoryChatById(Integer storyId){
+  public StoryChatVO getStoryChatById(Integer storyId) {
     StoryChatVO storyChatVO = new StoryChatVO();
-    StoryVO storyVO = storyMapper.selectStory(storyId);
+    StoryVO storyVO = storyMapper.selectStory(storyId, "ko");
     storyChatVO.setId(storyVO.getId());
     storyChatVO.setSessionId(storyVO.getSessionId());
     storyChatVO.setTitle(storyVO.getTitle());
@@ -132,10 +187,13 @@ public class StorySVC {
     storyChatVO.setCreater(storyVO.getCreater());
     List<ChatVO> chatList = chatSVC.getChatList(storyVO.getSessionId());
     storyChatVO.setChat(chatList);
-    KeywordResponseVO keywordResponseVO = keywordSVC.getKeyword(storyVO.getSessionId());
+    KeywordResponseVO keywordResponseVO = keywordSVC.getKeyword(
+      storyVO.getSessionId()
+    );
     storyChatVO.setKeyword(keywordResponseVO);
     return storyChatVO;
   }
+
   public void deleteStory(Integer storyId) {
     storyMapper.deleteStory(storyId);
     storyMapper.deletePage(storyId);
