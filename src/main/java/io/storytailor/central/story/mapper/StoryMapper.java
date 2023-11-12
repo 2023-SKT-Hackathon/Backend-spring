@@ -20,6 +20,7 @@ public interface StoryMapper {
   );
 
   List<PageVO> selectPageList(@Param("storyId") Integer storyId);
+  List<PageVO> selectPageListByLang(@Param("storyId") Integer storyId, @Param("lang") String lang);
 
   void deleteStory(@Param("storyId") Integer storyId);
   void deletePage(@Param("storyId") Integer storyId);

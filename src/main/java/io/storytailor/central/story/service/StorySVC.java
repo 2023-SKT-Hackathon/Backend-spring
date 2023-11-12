@@ -99,6 +99,7 @@ public class StorySVC {
       List<PageVO> pageList = new ArrayList<>();
       for (int idx = 0; idx < storyAiResponseVO.getImgPrompt().size(); idx++) {
         PageVO pageVO = new PageVO();
+        pageVO.setLang("ko");
         pageVO.setSessionId(storyRequestVO.getSessionId());
         pageVO.setStoryId(storyVO.getId());
         pageVO.setPageNo(idx);
@@ -125,10 +126,10 @@ public class StorySVC {
 
   public StoryVO getStoryById(Integer storyId, String lang) {
     /* if already exist Database */
-    StoryVO storyVO = storyMapper.selectStory(storyId, lang);
-    if (storyVO != null) {
-      List<PageVO> pageList = storyMapper.selectPageList(storyId);
-      storyVO.setPages(pageList);
+    List<PageVO> pList = storyMapper.selectPageListByLang(storyId, lang);
+    StoryVO storyVO = storyMapper.selectStory(storyId, "ko");
+    if (pList.size() > 0) {
+      storyVO.setPages(pList);
       return storyVO;
     } else {
       StoryVO storyKoVO = storyMapper.selectStory(storyId, "ko");
@@ -136,6 +137,7 @@ public class StorySVC {
       storyKoVO.setPages(pageKoList);
       TranslateVO translateVO = new TranslateVO();
       List<String> storyPages = new ArrayList<>();
+      storyPages.add(storyKoVO.getTitle());
       for (PageVO pageVO : storyKoVO.getPages()) {
         storyPages.add(pageVO.getPageContent());
       }
@@ -154,16 +156,16 @@ public class StorySVC {
       );
       log.info("AI Story Response: " + res.getBody());
       TranslateVO translateResponseVO = res.getBody();
-
       if (translateResponseVO != null) {
         storyKoVO.setLang(lang);
-        storyKoVO.setTitle(translateVO.getStory().get(0));
-        storyMapper.insertStory(storyKoVO);
+        storyKoVO.setTitle(translateResponseVO.getStory().get(0));
+        
         List<PageVO> pageList = new ArrayList<>();
         for (int idx = 1; idx < translateResponseVO.getStory().size(); idx++) {
           PageVO pageVO = new PageVO();
           pageVO.setSessionId(storyKoVO.getSessionId());
-          pageVO.setStoryId(storyKoVO.getId());
+          pageVO.setLang(lang);
+          pageVO.setStoryId(storyId);
           pageVO.setPageNo(idx - 1);
           pageVO.setPageContent(translateResponseVO.getStory().get(idx));
           pageVO.setPageImg(storyKoVO.getPages().get(idx - 1).getPageImg());
@@ -171,6 +173,7 @@ public class StorySVC {
           pageList.add(pageVO);
         }
         storyKoVO.setPages(pageList);
+        storyMapper.insertStory(storyKoVO);
         return storyKoVO;
       } else return null;
     }

@@ -11,7 +11,7 @@ spring:
 
   datasource:
     driverClassName: org.postgresql.Driver
-    jdbcUrl: jdbc:postgresql://storytailor-db.c1dmi7dj6oou.ap-northeast-2.rds.amazonaws.com:5432/storytailor
+    jdbcUrl: jdbc:postgresql://112.136.167.70:5432/storytailor
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
   servlet:
@@ -23,7 +23,7 @@ server:
   port: 8008
 
 flask:
-  base-url: http://13.124.249.81:8083/tailor/
+  base-url: http://112.136.167.70:8083/tailor/
 
 openai-service:
   api-key: ${OPEN_AI_API_KEY}

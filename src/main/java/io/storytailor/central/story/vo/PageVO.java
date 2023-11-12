@@ -10,4 +10,5 @@ public class PageVO {
     private Integer pageNo;
     private String pageImg;
     private String pageContent;
+    private String lang;
 }
