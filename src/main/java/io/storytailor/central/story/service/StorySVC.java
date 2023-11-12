@@ -159,7 +159,7 @@ public class StorySVC {
       if (translateResponseVO != null) {
         storyKoVO.setLang(lang);
         storyKoVO.setTitle(translateResponseVO.getStory().get(0));
-        
+
         List<PageVO> pageList = new ArrayList<>();
         for (int idx = 1; idx < translateResponseVO.getStory().size(); idx++) {
           PageVO pageVO = new PageVO();
@@ -173,6 +173,7 @@ public class StorySVC {
           pageList.add(pageVO);
         }
         storyKoVO.setPages(pageList);
+        storyKoVO.setLang(lang);
         storyMapper.insertStory(storyKoVO);
         return storyKoVO;
       } else return null;
