@@ -127,8 +127,8 @@ public class StorySVC {
   public StoryVO getStoryById(Integer storyId, String lang) {
     /* if already exist Database */
     List<PageVO> pList = storyMapper.selectPageListByLang(storyId, lang);
+    StoryVO storyVO = storyMapper.selectStory(storyId, "ko");
     if (pList.size() > 0) {
-      StoryVO storyVO = storyMapper.selectStory(storyId, lang);
       storyVO.setLang(lang);
       storyVO.setPages(pList);
       return storyVO;

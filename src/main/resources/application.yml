@@ -47,3 +47,10 @@ http.pool:
   connection.request.timeout: 100000
   read.timeout: 100000
   validate.after.inactivity: 2000
+
+login:
+  kakao:
+    login-url: https://kauth.kakao.com/oauth/authorize
+    token-url: https://kauth.kakao.com/oauth/token
+    client-id: ${KAKAO_CLIENT_ID}
+    redirect-uri: http://localhost:8080/api/login/callback/kakao
