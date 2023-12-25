@@ -5,7 +5,9 @@ import com.theokanning.openai.image.CreateImageRequest;
 import com.theokanning.openai.image.ImageResult;
 import com.theokanning.openai.service.OpenAiService;
 import io.storytailor.central.code.FileCode;
+import io.storytailor.central.config.rest.RestService;
 import io.storytailor.central.image.mapper.ImageMapper;
+import io.storytailor.central.image.vo.ImageAiResponseVO;
 import io.storytailor.central.image.vo.ImageInfoVO;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
@@ -21,6 +23,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.imageio.ImageIO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +58,9 @@ public class ImageSVC {
 
   @Autowired
   private ImageMapper imageMapper;
+
+  @Autowired
+  private RestService restService; 
 
   public ImageInfoVO uploadImage(
     MultipartFile originFile,
@@ -166,15 +174,16 @@ public class ImageSVC {
           pageIdx.toString()
         );
       } else {
-        CreateImageRequest imageReq = new CreateImageRequest(
-          prompt,
-          1,
-          "1024x1024",
-          null,
-          null
-        );
-        ImageResult genRes = openAiService.createImage(imageReq);
-        String genImg = genRes.getData().get(0).getUrl();
+        // CreateImageRequest imageReq = new CreateImageRequest(
+        //   prompt,
+        //   1,
+        //   "1024x1024",
+        //   null,
+        //   null
+        // );
+        // ImageResult genRes = openAiService.createImage(imageReq);
+        // String genImg = genRes.getData().get(0).getUrl();
+        String genImg = createAiImageByDalle3(prompt, 1, "1024x1024", "dall-e-3", "standard");
         return downloadImageFromUrl(
           sessionId,
           FileCode.AI,
@@ -186,6 +195,22 @@ public class ImageSVC {
       log.error("Fail to Generate Image", e);
       return null;
     }
+  }
+  private String createAiImageByDalle3(String prompt, Integer n, String size, String model, String quality){
+    String url = "";
+    Map<String, Object> params = new HashMap<>();
+    params.put("prompt", prompt);
+    params.put("n", n);
+    params.put("size", size);
+    params.put("model", model);
+    params.put("quality", quality);
+    Map<String, String> headers = new HashMap<>();
+    headers.put("Content-Type", "application/json");
+
+    ImageAiResponseVO res = restService.post("https://api.openai.com/v1/images/generations", null, headers, params, null, openaiApiKey, ImageAiResponseVO.class).getBody();
+    url = res.getData().get(0).get("url");
+    return url;
+
   }
 
   public String downloadImageFromUrl(
