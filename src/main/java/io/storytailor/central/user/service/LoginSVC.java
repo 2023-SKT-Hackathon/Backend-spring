@@ -66,33 +66,11 @@ public class LoginSVC {
       ChatResponseVO.class
     );
     log.info("AI Chat Response: " + res.getBody());
-    ChatResponseVO responseVO = res.getBody();
-    ChatVO resChatVO = convertChatResponseVOToChatVO(responseVO);
+
     if (responseVO != null) {
-      /* Insert Chat Hist */
-      chatMapper.insertChat(chatVO);
-      /* save AI msg in Database */
-      chatMapper.insertChat(resChatVO);
-      /* keyword save */
-      if (responseVO.getStatus().toUpperCase().equals("TRUE")) {
-        /* Extract Keyword */
-        for (String keyword : responseVO.getKeyword()) {
-          KeywordVO keywordVO = new KeywordVO();
-          keywordVO.setSessionId(Integer.parseInt(responseVO.getSessionId()));
-          keywordVO.setType("extract");
-          keywordVO.setKeyword(keyword);
-          keywordSVC.createTempKeyword(keywordVO);
-        }
-        /* Recommand Keyword */
-        for (String keyword : responseVO.getRecoKeyword()) {
-          KeywordVO keywordVO = new KeywordVO();
-          keywordVO.setSessionId(Integer.parseInt(responseVO.getSessionId()));
-          keywordVO.setType("recommand");
-          keywordVO.setKeyword(keyword);
-          keywordSVC.createTempKeyword(keywordVO);
-        }
-      }
+     
     }
     return resChatVO;
   }
+}
 }
