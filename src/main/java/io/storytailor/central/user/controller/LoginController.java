@@ -28,15 +28,13 @@ public class LoginController<T> {
 
   @GetMapping("/api/login/callback/kakao")
   public ResponseEntity<?> loginCallback(
-    @RequestParam String code,
-    @RequestParam String state,
-    @RequestParam String error,
-    @RequestParam String error_description
+    @RequestParam("code") String code,
+    @RequestParam(required = false, name = "error") String error,
+    @RequestParam(required = false, name = "error_description") String errorDesc
   ) {
     if (error != null) {
-      return ResponseEntity.badRequest().body(error_description);
+      return ResponseEntity.badRequest().body(errorDesc);
     }
-
-    return ResponseEntity.ok().body("loginCallback");
+    return ResponseEntity.ok().body(loginSVC.loginCallback(code));
   }
 }

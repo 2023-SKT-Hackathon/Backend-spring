@@ -10,12 +10,12 @@
     keyProperty="id" keyColumn="id"> INSERT INTO page (page_no, page_img_path, page_content,
     story_id, created_at, lang) VALUES (#{pageVO.pageNo}, #{pageVO.pageImg}, #{pageVO.pageContent},
     #{pageVO.storyId}, now(), #{pageVO.lang}) </insert>
-  <select id="selectStoryList" resultType="io.storytailor.central.story.vo.StoryVO"> SELECT id,
+  <select id="selectStoryList" parameterType="io.storytailor.central.user.vo.UserVO" resultType="io.storytailor.central.story.vo.StoryVO"> SELECT id,
     session_id AS sessionId, cover_img_url AS coverImg, title, creater, lang, created_at AS
-    createdAt FROM story WHERE lang = 'ko'</select>
-  <select id="selectStory" resultType="io.storytailor.central.story.vo.StoryVO"> SELECT id,
+    createdAt FROM story WHERE lang = 'ko' AND session_id IN (SELECT id FROM session WHERE user_name = #{userVO.account.name} AND user_email = #{userVO.account.email})</select>
+  <select id="selectStory" parameterType="io.storytailor.central.user.vo.UserVO" resultType="io.storytailor.central.story.vo.StoryVO"> SELECT id,
     session_id AS sessionId, cover_img_url AS coverImg, title, creater, lang, created_at AS
-    createdAt FROM story WHERE id = #{storyId} AND lang = #{lang} </select>
+    createdAt FROM story WHERE id = #{storyId} AND lang = #{lang} AND session_id IN (SELECT id FROM session WHERE user_name = #{userVO.account.name} AND user_email = #{userVO.account.email})</select>
   <select id="selectPageList" parameterType="Integer"
     resultType="io.storytailor.central.story.vo.PageVO"> SELECT id, story_id AS storyId, page_no AS
     pageNo, page_img_path AS pageImg, page_content AS pageContent, created_at AS createdAt FROM page
@@ -24,6 +24,6 @@
     resultType="io.storytailor.central.story.vo.PageVO"> SELECT id, story_id AS storyId, page_no AS
     pageNo, page_img_path AS pageImg, page_content AS pageContent, created_at AS createdAt FROM page
     WHERE story_id = #{storyId} AND lang = #{lang}</select>
-  <delete id="deleteStory" parameterType="Integer"> DELETE FROM story WHERE id = #{storyId} </delete>
+  <delete id="deleteStory" parameterType="io.storytailor.central.user.vo.UserVO"> DELETE FROM story WHERE id = #{storyId} AND session_id IN (SELECT id FROM session WHERE user_name = #{userVO.account.name} AND user_email = #{userVO.account.email})</delete>
   <delete id="deletePage" parameterType="Integer"> DELETE FROM page WHERE story_id = #{storyId} </delete>
 </mapper> 

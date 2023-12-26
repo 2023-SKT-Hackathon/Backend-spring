@@ -11,7 +11,7 @@ spring:
 
   datasource:
     driverClassName: org.postgresql.Driver
-    jdbcUrl: jdbc:postgresql://112.136.167.70:5432/storytailor
+    jdbcUrl: jdbc:postgresql://112.136.167.70:5432/storytailor_dev
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
   servlet:
@@ -49,8 +49,13 @@ http.pool:
   validate.after.inactivity: 2000
 
 login:
+  token:
+    secret: ${JWT_SECRET}
+    access-time: 3600000
+    refresh-time: 36000000
   kakao:
     login-url: https://kauth.kakao.com/oauth/authorize
     token-url: https://kauth.kakao.com/oauth/token
+    user-info-url: https://kapi.kakao.com/v2/user/me
     client-id: ${KAKAO_CLIENT_ID}
-    redirect-uri: http://localhost:8080/api/login/callback/kakao
+    redirect-url: http://localhost:8008/api/login/callback/kakao

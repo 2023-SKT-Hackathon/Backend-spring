@@ -14,6 +14,7 @@ import io.storytailor.central.story.vo.StoryChatVO;
 import io.storytailor.central.story.vo.StoryRequestVO;
 import io.storytailor.central.story.vo.StoryVO;
 import io.storytailor.central.story.vo.TranslateVO;
+import io.storytailor.central.user.vo.UserVO;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -120,20 +121,20 @@ public class StorySVC {
     return storyVO;
   }
 
-  public List<StoryVO> getStoryList() {
-    return storyMapper.selectStoryList();
+  public List<StoryVO> getStoryList(UserVO user) {
+    return storyMapper.selectStoryList(user);
   }
 
-  public StoryVO getStoryById(Integer storyId, String lang) {
+  public StoryVO getStoryById(Integer storyId, String lang, UserVO user) {
     /* if already exist Database */
     List<PageVO> pList = storyMapper.selectPageListByLang(storyId, lang);
-    StoryVO storyVO = storyMapper.selectStory(storyId, "ko");
+    StoryVO storyVO = storyMapper.selectStory(storyId, "ko", user);
     if (pList.size() > 0) {
       storyVO.setLang(lang);
       storyVO.setPages(pList);
       return storyVO;
     } else {
-      StoryVO storyKoVO = storyMapper.selectStory(storyId, "ko");
+      StoryVO storyKoVO = storyMapper.selectStory(storyId, "ko", user);
       List<PageVO> pageKoList = storyMapper.selectPageList(storyId);
       storyKoVO.setPages(pageKoList);
       TranslateVO translateVO = new TranslateVO();
@@ -181,9 +182,9 @@ public class StorySVC {
     }
   }
 
-  public StoryChatVO getStoryChatById(Integer storyId) {
+  public StoryChatVO getStoryChatById(Integer storyId, UserVO user) {
     StoryChatVO storyChatVO = new StoryChatVO();
-    StoryVO storyVO = storyMapper.selectStory(storyId, "ko");
+    StoryVO storyVO = storyMapper.selectStory(storyId, "ko", user);
     storyChatVO.setId(storyVO.getId());
     storyChatVO.setSessionId(storyVO.getSessionId());
     storyChatVO.setTitle(storyVO.getTitle());
@@ -199,8 +200,8 @@ public class StorySVC {
     return storyChatVO;
   }
 
-  public void deleteStory(Integer storyId) {
-    storyMapper.deleteStory(storyId);
-    storyMapper.deletePage(storyId);
+  public void deleteStory(Integer storyId, UserVO user) {
+    storyMapper.deleteStory(storyId, user);
+    storyMapper.deletePage(storyId, user);
   }
 }

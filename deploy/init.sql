@@ -5,6 +5,21 @@
 CREATE SEQUENCE session_id_seq INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
 CREATE TABLE session (
     id INT NOT NULL DEFAULT nextval('session_id_seq' :: regclass),
+    user_name TEXT NOT NULL,
+    user_email TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id)
+);
+
+CREATE SEQUENCE user_id_seq INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
+CREATE TABLE "user" (
+    id INT NOT NULL DEFAULT nextval('user_id_seq' :: regclass),
+    name TEXT NOT NULL,
+    email TEXT NOT NULL,
+    access_token TEXT ,
+    expires_in INT ,
+    refresh_token TEXT ,
+    refresh_token_expires_in INT ,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id)
 );
@@ -50,6 +65,7 @@ CREATE TABLE page (
     page_content TEXT,
     story_id INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    lang TEXT,
     PRIMARY KEY (id)
 );
 

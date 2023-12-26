@@ -4,6 +4,9 @@ import io.storytailor.central.story.service.StorySVC;
 import io.storytailor.central.story.vo.StoryChatVO;
 import io.storytailor.central.story.vo.StoryRequestVO;
 import io.storytailor.central.story.vo.StoryVO;
+import io.storytailor.central.user.service.LoginSVC;
+import io.storytailor.central.user.vo.UserVO;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -21,29 +24,39 @@ public class StoryController {
   @Autowired
   private StorySVC storySVC;
 
+  @Autowired
+  private LoginSVC loginSVC;
+
   @GetMapping("/api/story/list")
-  public ResponseEntity<List<StoryVO>> getStoryList() {
-    List<StoryVO> res = storySVC.getStoryList();
+  public ResponseEntity<List<StoryVO>> getStoryList(
+    HttpServletRequest request
+  ) {
+    UserVO user = loginSVC.getUserVO(loginSVC.resolveToken(request));
+    List<StoryVO> res = storySVC.getStoryList(user);
     return ResponseEntity.ok().body(res);
   }
 
   @GetMapping("/api/story/{storyId}")
   public ResponseEntity<StoryVO> getStory(
+    HttpServletRequest request,
     @PathVariable Integer storyId,
     @RequestParam("lang") String lang
   ) {
     if (lang == null) {
       lang = "ko";
     }
-    StoryVO res = storySVC.getStoryById(storyId, lang);
+    UserVO user = loginSVC.getUserVO(loginSVC.resolveToken(request));
+    StoryVO res = storySVC.getStoryById(storyId, lang, user);
     return ResponseEntity.ok().body(res);
   }
 
   @GetMapping("/api/story/{storyId}/chat")
   public ResponseEntity<StoryChatVO> getStoryChat(
+    HttpServletRequest request,
     @PathVariable Integer storyId
   ) {
-    StoryChatVO res = storySVC.getStoryChatById(storyId);
+    UserVO user = loginSVC.getUserVO(loginSVC.resolveToken(request));
+    StoryChatVO res = storySVC.getStoryChatById(storyId, user);
     return ResponseEntity.ok().body(res);
   }
 
@@ -56,8 +69,12 @@ public class StoryController {
   }
 
   @DeleteMapping("/api/story/{storyId}")
-  public ResponseEntity<?> deleteStory(@PathVariable Integer storyId) {
-    storySVC.deleteStory(storyId);
+  public ResponseEntity<?> deleteStory(
+    HttpServletRequest request,
+    @PathVariable Integer storyId
+  ) {
+    UserVO user = loginSVC.getUserVO(loginSVC.resolveToken(request));
+    storySVC.deleteStory(storyId, user);
     return ResponseEntity.ok().body("Success");
   }
 }

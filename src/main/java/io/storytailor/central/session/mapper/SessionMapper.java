@@ -6,5 +6,9 @@ import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface SessionMapper {
-  void createSession(@Param("SessionVO") SessionVO session);
+  void createSession(
+    @Param("SessionVO") SessionVO session,
+    @Param("name") String user,
+    @Param("email") String email
+  );
 }
